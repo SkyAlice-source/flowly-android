@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 左半：跟随系统时的“暗”侧(实心) -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M12,4A8,8 0 0,0 12,20Z" />
+    <!-- 外圈描边 -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.5"
+        android:pathData="M12,4A8,8 0 1,0 12,20A8,8 0 1,0 12,4Z" />
+    <!-- 右半“亮”侧：三道阳光 -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M20,12H22.4M18.6,7.4L20.2,5.8M18.6,16.6L20.2,18.2" />
+</vector>

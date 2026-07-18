@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108"
+    android:tint="#FFFFFF">
+    <!-- Flow wave silhouette (white, system tints via colorized) -->
+    <path
+        android:pathData="M0,60 C20,42 40,42 54,58 C68,74 88,74 108,56 L108,108 L0,108 Z"
+        android:fillColor="#FFFFFFFF" />
+    <path
+        android:pathData="M0,72 C20,58 40,58 54,70 C68,82 88,82 108,68 L108,108 L0,108 Z"
+        android:fillColor="#FFFFFFFF" />
+    <!-- Bubble particles -->
+    <path
+        android:pathData="M38,30 A6,6 0 1,0 38,42 A6,6 0 1,0 38,30 Z"
+        android:fillColor="#FFFFFFFF" />
+    <path
+        android:pathData="M54,25 A4,4 0 1,0 54,33 A4,4 0 1,0 54,25 Z"
+        android:fillColor="#FFFFFFFF" />
+    <path
+        android:pathData="M68,35 A5,5 0 1,0 68,45 A5,5 0 1,0 68,35 Z"
+        android:fillColor="#FFFFFFFF" />
+    <path
+        android:pathData="M46,20 A3,3 0 1,0 46,26 A3,3 0 1,0 46,20 Z"
+        android:fillColor="#FFFFFFFF" />
+</vector>

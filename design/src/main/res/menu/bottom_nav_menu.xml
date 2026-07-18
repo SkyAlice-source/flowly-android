@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:icon="@drawable/ic_baseline_dashboard" android:id="@id/nav_dashboard" android:title="@string/main" />
+    <item android:icon="@drawable/ic_baseline_globe" android:id="@id/nav_proxy" android:title="@string/proxy" />
+    <item android:icon="@drawable/ic_baseline_doc" android:id="@id/nav_profiles" android:title="@string/profiles" />
+    <item android:icon="@drawable/ic_baseline_settings" android:id="@id/nav_settings" android:title="@string/settings" />
+</menu>

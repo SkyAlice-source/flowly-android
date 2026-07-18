@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowly 设计 Token 规范 v2.11.31-meta</title>
+<style>
+  :root{
+    --accent:#496CEF; --accent-press:#3655CD; --ink:#1c1d22; --ink2:#5b5e66;
+    --line:#e7e8ec; --bg:#ffffff; --bg2:#f7f8fa; --warn:#efa831; --bad:#ea3c3f; --ok:#3fc168;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--ink);background:var(--bg2);line-height:1.6;font-size:14px}
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 24px 64px}
+  header.top{border-bottom:3px solid var(--accent);padding-bottom:20px;margin-bottom:28px}
+  header.top h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+  header.top .sub{color:var(--ink2);margin-top:6px;font-size:13px}
+  header.top .meta{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .pill{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12px;color:var(--ink2)}
+  .pill b{color:var(--ink)}
+  section{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:22px}
+  section h2{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  section h2 .tag{font-size:11px;font-weight:600;color:var(--accent);background:#eef2ff;border-radius:6px;padding:2px 8px}
+  section .desc{color:var(--ink2);font-size:13px;margin-bottom:18px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:760px){.g2,.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+  .sw{background:var(--bg2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .sw .chip{height:64px;display:block}
+  .sw .info{padding:10px 12px}
+  .sw .name{font-weight:600;font-size:13px}
+  .sw .hex{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--ink2);margin-top:2px}
+  .sw .role{font-size:11px;color:#8a8d94;margin-top:4px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
+  th{color:var(--ink2);font-weight:600;background:var(--bg2);font-size:12px}
+  td code,code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f0f1f5;padding:1px 6px;border-radius:5px;font-size:12px}
+  .tok{display:inline-block;background:#eef2ff;color:var(--accent);font-family:ui-monospace,monospace;font-size:12px;padding:1px 7px;border-radius:6px;margin:2px 0}
+  .spec{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;align-items:center}
+  .spec .k{font-weight:600;color:var(--ink2);font-size:13px;white-space:nowrap}
+  .spec .v{font-size:13px}
+  .bar{height:14px;border-radius:7px;display:inline-block;vertical-align:middle}
+  .callout{border-radius:12px;padding:16px 18px;font-size:13px;margin-top:6px}
+  .c-warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412}
+  .c-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+  .c-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+  .callout b{font-weight:700}
+  .legend{font-size:12px;color:var(--ink2);margin-top:10px}
+  .scale-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .scale-item{text-align:center;font-size:11px;color:var(--ink2)}
+  .scale-box{background:var(--accent);border-radius:4px;margin-bottom:6px}
+  footer{color:#9aa0a8;font-size:12px;text-align:center;margin-top:30px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+  .src{border:1px dashed var(--line);border-radius:10px;padding:12px 14px;font-size:12px}
+  .src h4{font-size:13px;margin-bottom:6px}
+  .src.x{border-color:#fca5a5;background:#fef2f2}
+  .src.y{border-color:#86efac;background:#f0fdf4}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Flowly 设计 Token 规范</h1>
+  <div class="sub">基于 flowly 工程真实代码的单一事实源文档 · 用于开发交付与视觉一致性校验</div>
+  <div class="meta">
+    <span class="pill">工程版本 <b>2.11.31-meta</b></span>
+    <span class="pill">应用 ID <b>com.flowly.net</b></span>
+    <span class="pill">构建 flavor <b>meta / debug</b></span>
+    <span class="pill">规范日期 <b>7月14日</b></span>
+    <span class="pill">状态 <b>已收敛（XML→CMFA-SPEC）</b></span>
+  </div>
+</header>
+
+<div class="callout c-ok">
+  <b>✅ 双源已收敛（2026-07-14）。</b><br>
+  XML 设计模块 <code>colors.xml</code> 已重映射到 Compose <code>Color.kt</code> 的 CMFA-SPEC 值：<code>color_connected_*</code> 由 <code>#10b981/#34d399</code> 统一为 <code>#3FC168</code>（ok，跨亮暗共享）；<code>color_light/dark_background</code> 对齐 BgGrad <code>#F8F7F2/#07080B</code>。另新增 <code>color_ok/color_warn/color_bad/color_accent*</code> 语义别名作为全工程单一事实源。Compose 补丁本身仍是孤儿（apply.sh 路径失效），但其 Token 值现在已是权威基准。
+</div>
+
+<!-- 1. 品牌色 -->
+<section>
+  <h2>1 · 品牌主色 <span class="tag">Brand</span></h2>
+  <div class="desc">主色驱动按钮填充、开关 ON 态、图标底色、启动按钮。白字叠在主色上对比度约 4.55:1，刚好过 WCAG AA 普通文本线。</div>
+  <div class="grid g4">
+    <div class="sw"><span class="chip" style="background:#496CEF"></span><div class="info"><div class="name">Accent 主色</div><div class="hex">#496CEF</div><div class="role">品牌主色 / 填充</div></div></div>
+    <div class="sw"><span class="chip" style="background:#3655CD"></span><div class="info"><div class="name">Accent Press</div><div class="hex">#3655CD</div><div class="role">按下态</div></div></div>
+    <div class="sw"><span class="chip" style="background:#1F496CEF"></span><div class="info"><div class="name">Accent Soft</div><div class="hex">#1F496CEF</div><div class="role">12% 主色底（浅色）</div></div></div>
+    <div class="sw"><span class="chip" style="background:#5b7be8"></span><div class="info"><div class="name">Clash Dark</div><div class="hex">#5b7be8</div><div class="role">XML 源深色 clash</div></div></div>
+  </div>
+  <div class="legend">XML 源另定义了 <code>color_clash #1e4376</code>（浅色）、<code>ic_launcher_background #496cef</code>、<code>color_launcher_background #f0f4ff</code> —— 与 Compose 源存在命名分歧，建议统一为 Accent 体系。</div>
+</section>
+
+<!-- 2. 语义色 -->
+<section>
+  <h2>2 · 语义状态色 <span class="tag">Semantic</span></h2>
+  <div class="desc">用于连接状态、延迟、错误反馈。Compose 源定义 ok/warn/bad 跨亮暗主题共享；XML 源用 <code>color_connected</code> 表示已连接。</div>
+  <div class="grid g3">
+    <div class="sw"><span class="chip" style="background:#3FC168"></span><div class="info"><div class="name">Ok / Connected</div><div class="hex">#3FC168</div><div class="role">Compose 源（低延迟·已连接）</div></div></div>
+    <div class="sw"><span class="chip" style="background:#EFA831"></span><div class="info"><div class="name">Warn</div><div class="hex">#EFA831</div><div class="role">中延迟 / 警示</div></div></div>
+    <div class="sw"><span class="chip" style="background:#EA3C3F"></span><div class="info"><div class="name">Bad / Error</div><div class="hex">#EA3C3F</div><div class="role">高延迟 / 错误</div></div></div>
+    <div class="sw"><span class="chip" style="background:#3FC168"></span><div class="info"><div class="name">Connected (XML→对齐)</div><div class="hex">#3FC168</div><div class="role">已对齐 Compose ok（2026-07-14 收敛）</div></div></div>
+    <div class="sw"><span class="chip" style="background:#3FC168"></span><div class="info"><div class="name">Connected Dark (同值)</div><div class="hex">#3FC168</div><div class="role">SPEC：ok/warn/bad 跨主题共享</div></div></div>
+    <div class="sw"><span class="chip" style="background:#b00020"></span><div class="info"><div class="name">Color Error</div><div class="hex">#b00020</div><div class="role">XML 源·错误红</div></div></div>
+  </div>
+</section>
+
+<!-- 3. 模式色 -->
+<section>
+  <h2>3 · 代理模式色 <span class="tag">Mode</span></h2>
+  <div class="desc">直连 / 全局 / 规则三种代理模式用稳定色区分，已写入 <code>styles.xml</code> 的 <code>colorModeDirect/Global/Rule</code> 主题属性。</div>
+  <div class="grid g3">
+    <div class="sw"><span class="chip" style="background:#14B8A6"></span><div class="info"><div class="name">Direct 直连</div><div class="hex">#14B8A6</div><div class="role">teal</div></div></div>
+    <div class="sw"><span class="chip" style="background:#F59E0B"></span><div class="info"><div class="name">Global 全局</div><div class="hex">#F59E0B</div><div class="role">amber</div></div></div>
+    <div class="sw"><span class="chip" style="background:#496CEF"></span><div class="info"><div class="name">Rule 规则</div><div class="hex">#496CEF</div><div class="role">accent 蓝</div></div></div>
+  </div>
+</section>
+
+<!-- 4. 中性 / 表面 -->
+<section>
+  <h2>4 · 中性色与表面 <span class="tag">Neutral</span></h2>
+  <div class="desc">文字墨色（ink）与表面层级。亮/暗主题各一套，由主题属性 <code>colorSurface2</code> / <code>colorLineSoft</code> 暴露给组件。</div>
+  <div class="two">
+    <div>
+      <h4 style="font-size:13px;margin:4px 0 10px;color:var(--ink2)">浅色主题</h4>
+      <table>
+        <tr><th>Token</th><th>值</th><th>用途</th></tr>
+        <tr><td>Ink3 Light</td><td><code>#83868C</code></td><td>次要文字</td></tr>
+        <tr><td>Background</td><td><code>#FAFAFA</code></td><td>页面背景</td></tr>
+        <tr><td>Surface 2</td><td><code>#F1F1F4</code></td><td>卡片/分区底</td></tr>
+        <tr><td>Line Soft</td><td><code>#0F000000</code></td><td>分隔线（黑6%）</td></tr>
+        <tr><td>Icon Bg</td><td><code>#1F496CEF</code></td><td>图标底色（12%accent）</td></tr>
+        <tr><td>Glow</td><td><code>#22496CEF</code></td><td>光晕</td></tr>
+        <tr><td>Bg Grad</td><td><code>#F8F7F2</code></td><td>渐变背景</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4 style="font-size:13px;margin:4px 0 10px;color:var(--ink2)">深色主题</h4>
+      <table>
+        <tr><th>Token</th><th>值</th><th>用途</th></tr>
+        <tr><td>Ink3 Dark</td><td><code>#7D8086</code></td><td>次要文字</td></tr>
+        <tr><td>Background</td><td><code>#0F0F12</code></td><td>页面背景</td></tr>
+        <tr><td>Surface</td><td><code>#1A1A24</code></td><td>主表面</td></tr>
+        <tr><td>Surface 2</td><td><code>#252530</code></td><td>卡片/分区底</td></tr>
+        <tr><td>Line Soft</td><td><code>#1AFFFFFF</code></td><td>分隔线（白10%）</td></tr>
+        <tr><td>Icon Bg</td><td><code>#245B7BE8</code></td><td>图标底色（14%accent）</td></tr>
+        <tr><td>Bg Grad</td><td><code>#07080B</code></td><td>渐变背景</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 排版 -->
+<section>
+  <h2>5 · 排版 <span class="tag">Type</span></h2>
+  <div class="desc">来自 Compose <code>Type.kt</code>（SPEC §1.3）。规划字体为 Space Grotesk（显示）/ Manrope（正文）/ Space Mono（等宽数字），<b>已采用方案 B 打包本地 TTF 嵌入</b>（离线代理 App，避免运行时下载依赖 Google 服务）。三套 <code>font-family</code> 资源见 <code>design/src/main/res/font/</code>。</div>
+  <table>
+    <tr><th>角色</th><th>规划字体</th><th>资源实现</th><th>权重</th><th>用途</th></tr>
+    <tr><td>Display</td><td>Space Grotesk</td><td><code>@font/flowly_display</code>（variable TTF）</td><td>Bold/Semi/Med/Normal</td><td>大标题、Logo 文字（已接 design_main 顶部标题）</td></tr>
+    <tr><td>Body</td><td>Manrope</td><td><code>@font/flowly_body</code>（variable TTF，全局默认）</td><td>同左</td><td>正文、按钮、卡片</td></tr>
+    <tr><td>Metric</td><td>Space Mono</td><td><code>@font/flowly_mono</code>（static 400/700）</td><td>Bold</td><td>速率/延迟/统计数字（已接表盘 + 流量 TextView）</td></tr>
+  </table>
+  <div class="legend">字号沿用 Material 规范：标题 20sp、小标题 16sp、正文 14sp、说明 12sp（见 <code>dimens.xml</code> 的 <code>abc_text_size_*</code>）。已采用<b>方案 B 打包 TTF</b>：Space Grotesk + Manrope 为 variable 字体（单文件覆盖全字重），Space Mono 为 static 两字重，合计约 498KB（对 50MB+ APK 可忽略）。接入点：全局 Body 经 <code>AppTheme*Base</code> 的 <code>fontFamily</code>；Display/Metric 在 <code>design_main.xml</code> 标题与流量 TextView、<code>DialView.kt</code> 表盘绘制处显式引用。</div>
+</section>
+
+<!-- 6. 间距 -->
+<section>
+  <h2>6 · 间距系统 <span class="tag">Spacing</span></h2>
+  <div class="desc">4dp 基准栅格（SPEC §1.4），来自 Compose <code>Dimens.kt</code> 的 Sp2–Sp24 与 XML <code>main_*</code> 间距。</div>
+  <div class="scale-row">
+    <div class="scale-item"><div class="scale-box" style="width:8px;height:8px"></div>4</div>
+    <div class="scale-item"><div class="scale-box" style="width:16px;height:8px"></div>8</div>
+    <div class="scale-item"><div class="scale-box" style="width:24px;height:8px"></div>12</div>
+    <div class="scale-item"><div class="scale-box" style="width:32px;height:8px"></div>16</div>
+    <div class="scale-item"><div class="scale-box" style="width:40px;height:8px"></div>20</div>
+    <div class="scale-item"><div class="scale-box" style="width:48px;height:8px"></div>24</div>
+  </div>
+  <table style="margin-top:16px">
+    <tr><th>Token</th><th>dp</th><th>典型用途</th></tr>
+    <tr><td><span class="tok">Sp4</span></td><td>4</td><td>最小内边距、元素间隙</td></tr>
+    <tr><td><span class="tok">Sp8</span></td><td>8</td><td>紧凑间距</td></tr>
+    <tr><td><span class="tok">Sp10</span> / <span class="tok">TileGap</span></td><td>10</td><td>磁贴间隙</td></tr>
+    <tr><td><span class="tok">Sp12</span> / AppBarPadY</td><td>12</td><td>AppBar 纵向 padding</td></tr>
+    <tr><td><span class="tok">Sp14</span> / AppBarPadBottom</td><td>14</td><td>AppBar 底部 padding（SPEC §2.2: 12/2/14）</td></tr>
+    <tr><td><span class="tok">Sp16</span></td><td>16</td><td>卡片内边距</td></tr>
+    <tr><td><span class="tok">Sp20</span> / ScreenPadX</td><td>20</td><td>屏幕横向留白</td></tr>
+    <tr><td><span class="tok">Sp24</span></td><td>24</td><td>大区块间距</td></tr>
+  </table>
+</section>
+
+<!-- 7. 尺寸 / 布局 -->
+<section>
+  <h2>7 · 尺寸与布局 Token <span class="tag">Sizing</span></h2>
+  <div class="desc">主页仪表盘与导航骨架尺寸，同时存在于 Compose <code>Dimens.kt</code> 与 XML <code>main_*</code>。</div>
+  <div class="spec">
+    <div class="k">FrameW 内容宽度</div><div class="v">380 dp</div>
+    <div class="k">StatusBarH 状态栏</div><div class="v">44 dp</div>
+    <div class="k">LogoSize 图标</div><div class="v">34 dp <span class="bar" style="width:34px;height:34px;background:var(--accent)"></span></div>
+    <div class="k">DialSize 流量表盘</div><div class="v">176 dp（Stroke 12 dp）<span class="bar" style="width:88px;height:88px;border-radius:50%;background:var(--accent)"></span></div>
+    <div class="k">TileH 功能磁贴</div><div class="v">84 dp 高 · Radius 15 dp · Gap 10 dp</div>
+    <div class="k">ConnBarH 启动按钮</div><div class="v">56 dp 高 · Radius 16 dp · Padding 17 dp</div>
+    <div class="k">BottomNavH 底栏</div><div class="v">74 dp（XML: <code>main_bottom_nav_height 74dp</code>）</div>
+    <div class="k">TopBannerH 顶栏</div><div class="v">56 dp</div>
+    <div class="k">HeroMetaRadius</div><div class="v">14 dp</div>
+  </div>
+</section>
+
+<!-- 8. 组件规格 -->
+<section>
+  <h2>8 · 核心组件规格 <span class="tag">Components</span></h2>
+
+  <h4 style="font-size:14px;margin:6px 0 10px">FlowlySwitch 开关（SPEC §2.10）</h4>
+  <div class="spec">
+    <div class="k">轨道</div><div class="v">46 × 27 dp，圆角 r999（全圆胶囊）</div>
+    <div class="k">滑块</div><div class="v">21 × 21 dp 白色圆，padding 2 dp，1dp 阴影</div>
+    <div class="k">ON 态</div><div class="v">轨道=Accent 主色</div>
+    <div class="k">OFF 态</div><div class="v">轨道=主题 outline（浅色线 / 深色线）</div>
+    <div class="k">动效</div><div class="v">颜色切换 tween 250ms</div>
+    <div class="k">实现</div><div class="v">自定义 Compose 组件（未用 Material3 Switch，因需精确 46×27）</div>
+  </div>
+
+  <h4 style="font-size:14px;margin:22px 0 10px">底部导航 BottomNav</h4>
+  <div class="spec">
+    <div class="k">高度</div><div class="v">74 dp</div>
+    <div class="k">Padding（apply.sh）</div><div class="v">8 / 10 / 0（左右/上下/底）</div>
+    <div class="k">菜单项</div><div class="v">配置 · 代理 · 日志 · 设置（4 项，ic_baseline_* 图标）</div>
+  </div>
+
+  <h4 style="font-size:14px;margin:22px 0 10px">主页磁贴 / 启动按钮</h4>
+  <div class="spec">
+    <div class="k">磁贴</div><div class="v">圆角 15dp，高 84dp，含图标+主标+副标，点击进入对应页</div>
+    <div class="k">启动按钮</div><div class="v">id <code>conn_button</code>，圆角 16dp，高 56dp，底部固定，文案「启动」</div>
+    <div class="k">表盘</div><div class="v">id <code>dial_view</code>，176dp，中心显示已转发/上行/下行 0 B</div>
+  </div>
+</section>
+
+<!-- 9. 主题属性映射 -->
+<section>
+  <h2>9 · 主题属性映射 <span class="tag">styles.xml</span></h2>
+  <div class="desc">XML 设计模块在 <code>AppThemeLight/Dark</code> 等主题中暴露的自定义属性，组件通过 <code>?attr/</code> 引用，实现亮暗自动切换。</div>
+  <table>
+    <tr><th>属性名</th><th>浅色值</th><th>深色值</th><th>语义</th></tr>
+    <tr><td><code>colorConnected</code></td><td>#3FC168</td><td>#3FC168</td><td>已连接（已收敛·跨主题共享）</td></tr>
+    <tr><td><code>colorSurface2</code></td><td>#F1F1F4</td><td>#252530</td><td>次级表面</td></tr>
+    <tr><td><code>colorLineSoft</code></td><td>#0F000000</td><td>#1AFFFFFF</td><td>柔和分隔线</td></tr>
+    <tr><td><code>colorModeDirect</code></td><td>#14B8A6</td><td>#14B8A6</td><td>直连模式</td></tr>
+    <tr><td><code>colorModeGlobal</code></td><td>#F59E0B</td><td>#F59E0B</td><td>全局模式</td></tr>
+    <tr><td><code>colorModeRule</code></td><td>#496CEF</td><td>#496CEF</td><td>规则模式</td></tr>
+  </table>
+  <div class="legend">主题基类：<code>Theme.MaterialComponents.Light.NoActionBar</code> / <code>Theme.MaterialComponents.NoActionBar</code>。底部弹窗、全屏弹窗各有 Dark/Light 变体。</div>
+</section>
+
+<!-- 10. 无障碍 -->
+<section>
+  <h2>10 · 无障碍基线 <span class="tag">A11y</span></h2>
+  <div class="grid g2">
+    <div class="callout c-ok"><b>对比度：</b>主色 #496CEF 上叠白字约 4.55:1，过 WCAG AA 普通文本线。模式色（teal/amber/蓝）用作图标与标签，建议仅作大号/加粗文本。</div>
+    <div class="callout c-info"><b>触控目标：</b>底栏/磁贴/启动按钮高度均 ≥ 44dp（74/84/56），满足最小触控区。开关 46×27 略低于 44 高，但为横滑控件，需保证周围留白。</div>
+    <div class="callout c-info"><b>减少动效：</b>转场动画（slide_in/out）、开关 tween 应尊重系统「减少动态效果」设置（Compose <code>rememberReduceMotion</code> / XML 动画可配置关闭）。</div>
+    <div class="callout c-warn"><b>待补：</b>XML 布局需补 <code>contentDescription</code>（icon 按钮已标 NAF，需复核）、Compose 组件补语义 <code>semantics</code>，确保屏幕阅读器可读。</div>
+  </div>
+</section>
+
+<!-- 11. 实施状态 -->
+<section>
+  <h2>11 · 实施状态与下一步 <span class="tag">Status</span></h2>
+  <div class="two">
+    <div class="src y">
+      <h4>✅ 已落地（XML 设计模块，已编译进 APK）</h4>
+      <p>colors.xml / styles.xml / dimens.xml 全套重定义；底部导航、仪表盘 DialView、模式胶囊、日/夜切换、滑入转场动画、多语言 strings；运行期布局 dump（ui_full.xml）验证通过。</p>
+    </div>
+    <div class="src x">
+      <h4>📦 已归档（Compose 补丁，2026-07-14 路线决策 A）</h4>
+      <p>含 11 个 Compose 文件（Color/Type/Dimens/Switch/BottomNav/各 Screen）。因 apply.sh 指向 <code>2026-07-11-20-43-18/Flowly</code>（已删除）且与当前 XML 架构不兼容，从未接入。已完整复制进 <code>archive/flowly-compose-patch/</code> 留存，其 token/字体值已沉淀进 XML 路线（见上方收敛进展）。源文件保底保留于 <code>.reasonix/.../flowly-patch/</code>。</p>
+    </div>
+  </div>
+  <div class="callout c-ok" style="margin-top:16px">
+    <b>收敛进展（按优先级）：</b><br>
+    1. ✅ <s>选定唯一 Token 源</s> 已完成：XML colors.xml 的 connected/background 已重映射到 CMFA-SPEC 值，消除亮暗色偏（2026-07-14）。<br>
+    2. ✅ <s>字体嵌入</s> 已完成：三套 TTF 打包进 design 模块（方案 B），全局 Body=Manrope、Display=Space Grotesk（标题/Logo）、Metric=Space Mono（表盘+流量数字）均接入（2026-07-14）。<br>
+    3. ✅ <s>决定 UI 路线</s> 已完成：选 A 留在 XML 路线，Compose 补丁已归档至 <code>archive/flowly-compose-patch/</code>（2026-07-14）。<br>
+    4. 把未提交的 XML 改动 commit 成基线，避免工作区清理时丢失。
+  </div>
+</section>
+
+<footer>
+  Flowly Design Token Spec · 由 UI Designer 基于工程真实资源生成 · 版本 2.11.31-meta · 7月14日<br>
+  数据源：design/src/main/res/values/{colors,themes,styles,dimens}.xml · .reasonix/global-workspace/flowly-patch/{Color,Type,Dimens,FlowlySwitch}.kt
+</footer>
+
+</div>
+</body>
+</html>
