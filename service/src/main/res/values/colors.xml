@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_clash">#1E4376</color>
+    <!-- Brand primary (vivid Flowly accent), used for notification colorized tint -->
+    <color name="color_accent">#FF496CEF</color>
+</resources>

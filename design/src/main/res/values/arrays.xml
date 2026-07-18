@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="bypass_private_route">
+        <item>1.0.0.0/8</item>
+        <item>2.0.0.0/7</item>
+        <item>4.0.0.0/6</item>
+        <item>8.0.0.0/7</item>
+        <item>11.0.0.0/8</item>
+        <item>12.0.0.0/6</item>
+        <item>16.0.0.0/4</item>
+        <item>32.0.0.0/3</item>
+        <item>64.0.0.0/3</item>
+        <item>96.0.0.0/4</item>
+        <item>112.0.0.0/5</item>
+        <item>120.0.0.0/6</item>
+        <item>124.0.0.0/7</item>
+        <item>126.0.0.0/8</item>
+        <item>128.0.0.0/3</item>
+        <item>160.0.0.0/5</item>
+        <item>168.0.0.0/8</item>
+        <item>169.0.0.0/9</item>
+        <item>169.128.0.0/10</item>
+        <item>169.192.0.0/11</item>
+        <item>169.224.0.0/12</item>
+        <item>169.240.0.0/13</item>
+        <item>169.248.0.0/14</item>
+        <item>169.252.0.0/15</item>
+        <item>169.255.0.0/16</item>
+        <item>170.0.0.0/7</item>
+        <item>172.0.0.0/12</item>
+        <item>172.32.0.0/11</item>
+        <item>172.64.0.0/10</item>
+        <item>172.128.0.0/9</item>
+        <item>173.0.0.0/8</item>
+        <item>174.0.0.0/7</item>
+        <item>176.0.0.0/4</item>
+        <item>192.0.0.0/9</item>
+        <item>192.128.0.0/11</item>
+        <item>192.160.0.0/13</item>
+        <item>192.169.0.0/16</item>
+        <item>192.170.0.0/15</item>
+        <item>192.172.0.0/14</item>
+        <item>192.176.0.0/12</item>
+        <item>192.192.0.0/10</item>
+        <item>193.0.0.0/8</item>
+        <item>194.0.0.0/7</item>
+        <item>196.0.0.0/6</item>
+        <item>200.0.0.0/5</item>
+        <item>208.0.0.0/4</item>
+        <item>240.0.0.0/5</item>
+        <item>248.0.0.0/6</item>
+        <item>252.0.0.0/7</item>
+        <item>254.0.0.0/8</item>
+        <item>255.0.0.0/9</item>
+        <item>255.128.0.0/10</item>
+        <item>255.192.0.0/11</item>
+        <item>255.224.0.0/12</item>
+        <item>255.240.0.0/13</item>
+        <item>255.248.0.0/14</item>
+        <item>255.252.0.0/15</item>
+        <item>255.254.0.0/16</item>
+        <item>255.255.0.0/17</item>
+        <item>255.255.128.0/18</item>
+        <item>255.255.192.0/19</item>
+        <item>255.255.224.0/20</item>
+        <item>255.255.240.0/21</item>
+        <item>255.255.248.0/22</item>
+        <item>255.255.252.0/23</item>
+        <item>255.255.254.0/24</item>
+        <item>255.255.255.0/25</item>
+        <item>255.255.255.128/26</item>
+        <item>255.255.255.192/27</item>
+        <item>255.255.255.224/28</item>
+        <item>255.255.255.240/29</item>
+        <item>255.255.255.248/30</item>
+        <item>255.255.255.252/31</item>
+        <item>255.255.255.254/32</item>
+    </string-array>
+    <string-array name="bypass_private_route6">
+        <item>::/1</item>
+        <item>8000::/2</item>
+        <item>c000::/3</item>
+        <item>e000::/4</item>
+        <item>f000::/5</item>
+        <item>f800::/6</item>
+        <item>fe00::/9</item>
+        <item>fec0::/10</item>
+    </string-array>
+    <array name="com_google_android_gms_fonts_certificates">
+        <item>@array/com_google_android_gms_fonts_certificates_dev</item>
+        <item>@array/com_google_android_gms_fonts_certificates_prod</item>
+    </array>
+    <string-array name="com_google_android_gms_fonts_certificates_dev">
+        <item>MIIEqDCCA5CgAwIBAgIJANWFu9E6bES4MA0GCSqGSIb3DQEB BQUAMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZv cm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4GA1UE ChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UE AxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBh bmRyb2lkLmNvbTAeFw0xNTA4MTEwMTEwMThaFw00NTA4MDEw MTEwMThaMIGUMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2Fs aWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4G A1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4G A1UEAxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9p ZEBhbmRyb2lkLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEP ADCCAQoCggEBAK4UY7K0lQmDx7QzVsnXn43QB2fgMwEofpD8 54jMJJ6XRhOVXxYpbzLon8uJYrl2NKX8qBi2zJ4CAbRvm2/k cz4sNYnCXM7IfRZxVZ+pBf3AIFtbLgfhF7pR+X+tE5SYi9+R 0w15H6vW2gQ8DMee+yCdsJhQRsNbVz7MkZJ46LWCM9RKlDyL zGHyPvqIJ2ld0aYbL2FJpYWvTRRJ50q5WgIsJjj1n25QY6TT 2RmoIsqLN6ZguUXaBt3gBjLv9Q0g5/9gxU4c8ml7w6eQhH+5 srP1ntamVFmqFQ2iHPG+G/PdsY6v6VR8LRRjk5vkOFo70zLQ vjsXbnmxHQl42cCAwEAAaOB0DCBzTAdBgNVHQ4EFgQUmhqC M+gwaEjvOQQRrMXf71B5k1EwgY0GA1UdIwSBhTCBgoAUmhqC M+gwaEjvOQQRrMXf71B5k1GhgZKkgY8wgYwxCzAJBgNVBAYT AlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1N b3VudGFpbiBWaWV3MRAwDgYDVQQKEwdBbmRyb2lkMRAwDgYD VQQLEwdBbmRyb2lkMRAwDgYDVQQDEwdBbmRyb2lkMSIwIAYJ KoZIhvcNAQkBFhNhbmRyb2lkQGFuZHJvaWQuY29tggkA1YW7 0TpsRLgwDQYJKoZIhvcNAQEFBQADggEBAGlgJw+RAdzUMUa2 psY/4F3Y/T3bI67SNrPzYF8cQJYQCJMQ1ONWL8HFOEa7OROi 7PgPMY5wGGJZN3VRJUeW1b58B8y+JQPLx+6rYR09S6C+o2Xy V+HOGFXkUGJgBWI4fi+jUTir2zFT6bG+SKXbRPXJPVQp3FVX 2vS1PmhZ3XW3wzo6MfWAl6RGqJq7MVYF2PUYZnWMoLfChve1 jCkKDUByTxb4xoj7XxNYDqvT05ft7ZJ6WQjMLsPHatIVN3b1 YGiI4SHh8T0CDs+3reBN67/DsmakQ7AD12Zqjf77I3d+oGEc H65vZph6PTmKq9cyCHqJKlPKRBJvs3rZ98M=</item>
+    </string-array>
+    <string-array name="com_google_android_gms_fonts_certificates_prod">
+        <item>MIIEQzCCAyugAwIBAgIJAMLgh0ZkSyCNMA0GCSqGSIb3DQEB BQUAMHQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9y bmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQK EwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9pZDEQMA4G A1UEAxMHQW5kcm9pZDAeFw0wODA4MjEyMzEzMzRaFw0zNjAx MDcyMzEzMzRaMHQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpD YWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQw EgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9p ZDEQMA4GA1UEAxMHQW5kcm9pZDCCASIwDQYJKoZIhvcNAQEB BQADggEPADCCAQoCggEBAKtWLgDYO6IIrgqWbVjKkQ8zQ7HY Q27h4Q9DqL6sDItdaVh1L3ES8bWxOHCS6vR1w2wYSX3SJ3hG tzOmxKjN6pLfVkaG+Lk7U0B6itWzPm9TYm8l2F5iGB4s9HIt Qm0wNqKB5WlRhZm2L7hmG53P3I7gKZDLmSFHMfB4wFuLSm/N HX3N60HmOGX8C1ALJuV3oPcrX9t0RFWU4KX2pOOrHYeaP3jD dchI8NAxQ6LgnV+ML/rIjHdR9PiJq4I3hHXqHCfqoXy/Y2dM 1WYSJjeBQHGT8Bu/GZAx/jMLZEG9ApxbXCZccMCRSUFEeSMl Wavw3kDCk3Q3Lb2fB0CAwEAAaOBojCBnzAdBgNVHQ4EFgQU Qn3L2oIjLiN4UTmF8ML8+CvXU6QwYQYDVR0jBFowWIAUQn3L 2oIjLiN4UTmF8ML8+CvXU6Sh eKR2MHQxCzAJBgNVBAYTAlVT MRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3Vu dGFpbiBWaWV3MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEQMA4G A1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9pZIIJAMLg h0ZkSyCNMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQAD ggEBAAvHpQcLUb36zUJH4ko1o4IClTv8JjaS7jQtvIvR7Sf3 9pJ/rGl1B8WnPmO2QadIM5dZELx3FGGJbl/3Fx7lWb4+9k+H mfyM0/T7qwYtSQ6ZTsGAL9P8Rfz8THQfBNqMljZphVKXjPRF lEygv2fIGVAUYBjPnpFSFgAdI+JMPE8R9eCu4kOCTPhBLSM7 82JhpRNII3F0LPB6a0KXALVMNfQv4BlLgIGJLRWlOp8ld/fv vCA80UwNNlE0wFn9B4qB8rGIAQ2kDBYTjR1mR+QVqVGYoY4K yyI4LOrFoDGy5+Bs87pNDwSmV3ME9wFpIhn2e3qSAJYJS6s9 kfRbj2s=</item>
+    </string-array>
+</resources>

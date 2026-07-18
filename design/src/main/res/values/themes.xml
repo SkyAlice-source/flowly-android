@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The App* theme styles (AppTheme*, AppFullScreenDialog*, AppBottomSheet*)
+         live in values/styles.xml (rebranded superset that also defines the
+         custom theme attributes colorMode*, colorConnected, colorSurface2,
+         colorLineSoft, etc. used by the dashboard UI). This file is kept empty
+         to avoid duplicate-resource conflicts with styles.xml. -->
+</resources>
