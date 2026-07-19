@@ -308,7 +308,7 @@
     <string name="theme_auto">システムに従う</string>
     <string name="theme_dark">ダーク</string>
     <string name="theme_light">ライト</string>
-    <string name="tips_help">Clash Meta for Androidは&lt;strong>無料アプリ&lt;/strong>です。当開発者は&lt;strong>一切のプロキシサービスを提供していません。&lt;/strong> &lt;strong>サービスに関する問い合わせはご遠慮ください。&lt;/strong></string>
+    <string name="tips_help">Flowlyは&lt;strong>無料アプリ&lt;/strong>です。当開発者は&lt;strong>一切のプロキシサービスを提供していません。&lt;/strong> &lt;strong>サービスに関する問い合わせはご遠慮ください。&lt;/strong></string>
     <string name="tips_properties">&lt;strong>Clashプロファイル&lt;/strong>のみご利用可能です(&lt;strong>プロキシルール&lt;/strong>を含む)</string>
     <string name="toast_profile_updated_complete">Update profile %s completed</string>
     <string name="toast_profile_updated_failed">Update profile %1$s failed: %2$s</string>

@@ -31,6 +31,12 @@ import com.github.kr328.clash.design.R as DesignR
 class MainActivity : BaseActivity<MainDesign>() {
     private var currentMode: TunnelState.Mode = TunnelState.Mode.Rule
 
+    // 主题切换后 recreate() 会销毁旧界面的 Snackbar，故先把提示文案存起来，
+    // 等新界面就绪后再弹，使其与「规则切换」的提示表现一致。
+    companion object {
+        private var pendingThemeToast: Int? = null
+    }
+
     private val vpnRequestLauncher = registerForActivityResult(
         StartActivityForResult()
     ) { }
@@ -41,6 +47,12 @@ class MainActivity : BaseActivity<MainDesign>() {
         setContentDesign(design)
 
         design.fetch()
+
+        // 在 recreate() 后的新界面上补弹主题切换提示（与「规则切换」表现一致）
+        pendingThemeToast?.let { res ->
+            design.showToast(res, ToastDuration.Short)
+            pendingThemeToast = null
+        }
 
         val ticker = ticker(TimeUnit.SECONDS.toMillis(1))
 
@@ -118,7 +130,7 @@ class MainActivity : BaseActivity<MainDesign>() {
                                 else -> DesignR.string.theme_auto
                             }
 
-                            design.showToast(text, ToastDuration.Short)
+                            pendingThemeToast = text
                             recreate()
                         }
                         MainDesign.Request.OpenProxy -> {

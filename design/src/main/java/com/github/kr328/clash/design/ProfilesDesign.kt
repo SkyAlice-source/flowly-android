@@ -7,16 +7,15 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.github.kr328.clash.design.adapter.ProfileAdapter
+import com.github.kr328.clash.design.adapter.ProfileActions
 import com.github.kr328.clash.design.databinding.DesignProfilesBinding
-import com.github.kr328.clash.design.databinding.DialogProfilesMenuBinding
-import com.github.kr328.clash.design.dialog.AppBottomSheetDialog
 import com.github.kr328.clash.design.ui.ToastDuration
 import com.github.kr328.clash.design.util.*
 import com.github.kr328.clash.service.model.Profile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context) {
+class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context), ProfileActions {
     sealed class Request {
         object UpdateAll : Request()
         object Create : Request()
@@ -35,7 +34,7 @@ class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context)
 
     private val binding = DesignProfilesBinding
         .inflate(context.layoutInflater, context.root, false)
-    private val adapter = ProfileAdapter(context, this::requestActive, this::showMenu, this::requestEditDirect)
+    private val adapter = ProfileAdapter(context, this::requestActive, this)
 
     private var allUpdating: Boolean
         get() = adapter.states.allUpdating;
@@ -78,25 +77,31 @@ class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context)
 
         binding.activityBarLayout.applyFrom(context)
 
-        binding.mainList.recyclerList.also {
+        binding.recyclerList.also {
             it.bindAppBarElevation(binding.activityBarLayout)
             it.applyLinearAdapter(context, adapter)
         }
     }
 
-    private fun showMenu(profile: Profile) {
-        val dialog = AppBottomSheetDialog(context)
+    // ── ProfileActions implementation (inline chips) ──
 
-        val binding = DialogProfilesMenuBinding
-            .inflate(context.layoutInflater, dialog.window?.decorView as ViewGroup?, false)
-
-        binding.master = this
-        binding.self = dialog
-        binding.profile = profile
-
-        dialog.setContentView(binding.root)
-        dialog.show()
+    override fun onUpdate(profile: Profile) {
+        requests.trySend(Request.Update(profile))
     }
+
+    override fun onEdit(profile: Profile) {
+        requests.trySend(Request.Edit(profile))
+    }
+
+    override fun onDuplicate(profile: Profile) {
+        requests.trySend(Request.Duplicate(profile))
+    }
+
+    override fun onDelete(profile: Profile) {
+        requests.trySend(Request.Delete(profile))
+    }
+
+    // ── Toolbar / import actions ──
 
     fun requestUpdateAll() {
         allUpdating = true;
@@ -141,31 +146,25 @@ class ProfilesDesign(context: Context) : Design<ProfilesDesign.Request>(context)
         requests.trySend(Request.Active(profile))
     }
 
+    // ── Legacy Dialog-based methods (kept for potential future use) ──
+
     fun requestUpdate(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Update(profile))
-
         dialog.dismiss()
     }
 
     fun requestEdit(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Edit(profile))
-
         dialog.dismiss()
-    }
-
-    private fun requestEditDirect(profile: Profile) {
-        requests.trySend(Request.Edit(profile))
     }
 
     fun requestDuplicate(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Duplicate(profile))
-
         dialog.dismiss()
     }
 
     fun requestDelete(dialog: Dialog, profile: Profile) {
         requests.trySend(Request.Delete(profile))
-
         dialog.dismiss()
     }
 

@@ -13,10 +13,7 @@
             type="android.view.View.OnClickListener" />
         <variable
             name="menu"
-            type="android.view.View.OnClickListener" />
-        <variable
-            name="edit"
-            type="android.view.View.OnClickListener" />
+            type="com.github.kr328.clash.design.adapter.ProfileActions" />
         <import type="android.view.View" />
         <import type="com.github.kr328.clash.design.util.I18nKt" />
         <import type="com.github.kr328.clash.design.util.IntervalKt" />
@@ -77,44 +74,70 @@
                     android:textColor="?colorPrimary"
                     android:visibility="@{profile.active ? View.VISIBLE : View.GONE}" />
 
-                <FrameLayout
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="4dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:focusable="true"
-                    android:clickable="true"
-                    android:contentDescription="@string/edit"
-                    android:onClick="@{edit}">
+                <TextView
+                    android:id="@+id/action_update"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_settings_icon"
+                    android:gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/update"
+                    android:textSize="10sp"
+                    android:textColor="?colorControlNormal"
+                    android:visibility="@{profile.imported &amp;&amp; profile.type != com.github.kr328.clash.service.model.Profile.Type.File ? View.VISIBLE : View.GONE}"
+                    android:onClick="@{() -> menu.onUpdate(profile)}" />
 
-                    <View
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:alpha="0.55"
-                        android:background="@drawable/ic_baseline_edit"
-                        android:contentDescription="@null"
-                        android:importantForAccessibility="no" />
-                </FrameLayout>
+                <TextView
+                    android:id="@+id/action_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_settings_icon"
+                    android:gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/edit"
+                    android:textSize="10sp"
+                    android:textColor="?colorControlNormal"
+                    android:onClick="@{() -> menu.onEdit(profile)}" />
 
-                <FrameLayout
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:focusable="true"
-                    android:clickable="true"
-                    android:contentDescription="@string/more"
-                    android:onClick="@{menu}">
+                <TextView
+                    android:id="@+id/action_duplicate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_settings_icon"
+                    android:gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/duplicate"
+                    android:textSize="10sp"
+                    android:textColor="?colorControlNormal"
+                    android:visibility="@{profile.imported ? View.VISIBLE : View.GONE}"
+                    android:onClick="@{() -> menu.onDuplicate(profile)}" />
 
-                    <View
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:alpha="0.4"
-                        android:background="@drawable/ic_baseline_more_vert"
-                        android:contentDescription="@null"
-                        android:importantForAccessibility="no" />
-                </FrameLayout>
+                <TextView
+                    android:id="@+id/action_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_settings_icon"
+                    android:gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/delete"
+                    android:textSize="10sp"
+                    android:textColor="?attr/colorError"
+                    android:onClick="@{() -> menu.onDelete(profile)}" />
             </LinearLayout>
 
             <LinearLayout
@@ -149,42 +172,61 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:visibility="@{profile.download &lt; 2 ? View.GONE : View.VISIBLE}">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.6"
+                    android:alpha="0.7"
                     android:fontFamily="monospace"
                     android:textSize="11sp"
                     android:textColor="?colorControlNormal"
-                    android:text='@{profile.download > 1 ? I18nKt.toBytesString(profile.download + profile.upload) + "/" : ""}' />
+                    android:text='@{profile.download > 1 ? I18nKt.toBytesString(profile.download + profile.upload) : ""}' />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:alpha="0.4"
+                    android:fontFamily="monospace"
+                    android:textSize="10sp"
+                    android:textColor="?colorControlNormal"
+                    android:text="/" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.7"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:textColor="?colorControlNormal"
+                    android:text='@{profile.total > 1 ? I18nKt.toBytesString(profile.total) : ""}' />
 
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_weight="1" />
 
+                <ProgressBar
+                    style="?android:progressBarStyleHorizontal"
+                    android:layout_width="80dp"
+                    android:layout_height="6dp"
+                    android:max="1000"
+                    android:progressDrawable="@drawable/bg_progress_bar"
+                    android:progress="@{profile.total > 1 ? I18nKt.toProgress((profile.download + profile.upload) / (profile.total / 1000)) : 0}" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.6"
-                    android:fontFamily="monospace"
-                    android:textSize="11sp"
-                    android:textColor="?colorControlNormal"
-                    android:text='@{profile.total > 1 ? I18nKt.toBytesString(profile.total) : ""}' />
+                    android:layout_marginStart="6dp"
+                    android:alpha="0.7"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="?colorPrimary"
+                    android:text='@{profile.total > 1 ? I18nKt.toPercentString(profile.download + profile.upload, profile.total) : ""}' />
             </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:alpha="0.6"
-                android:textSize="11sp"
-                android:textColor="?colorControlNormal"
-                android:visibility="@{profile.expire == 0 ? View.GONE : View.VISIBLE}"
-                android:text='@{profile.expire > 0 ? I18nKt.toDateStr(profile.expire) : ""}' />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -192,27 +234,31 @@
                 android:layout_marginTop="4dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:visibility="@{profile.total &lt; 2 ? View.GONE : View.VISIBLE}">
-
-                <ProgressBar
-                    style="?android:progressBarStyleHorizontal"
-                    android:layout_width="0dp"
-                    android:layout_height="8dp"
-                    android:layout_weight="1"
-                    android:max="1000"
-                    android:progressTint="?colorPrimary"
-                    android:progress="@{profile.total > 1 ? I18nKt.toProgress((profile.download + profile.upload) / (profile.total / 1000)) : 0}" />
+                android:visibility="@{profile.expire == 0 ? View.GONE : View.VISIBLE}">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:alpha="0.7"
+                    android:text="@string/expire"
+                    android:textSize="11sp"
+                    android:textColor="?colorControlNormal"
+                    android:alpha="0.7" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
                     android:textSize="11sp"
                     android:textStyle="bold"
-                    android:textColor="?colorPrimary"
-                    android:text='@{profile.total > 1 ? I18nKt.toPercentString(profile.download + profile.upload, profile.total) : ""}' />
+                    android:textColor="?colorControlNormal"
+                    android:text='@{profile.expire > 0 ? I18nKt.toDateStr(profile.expire) : ""}' />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
             </LinearLayout>
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

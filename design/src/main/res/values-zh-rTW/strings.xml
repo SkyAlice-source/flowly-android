@@ -420,7 +420,7 @@
     <string name="theme_auto">跟隨系統</string>
     <string name="theme_dark">深色</string>
     <string name="theme_light">淺色</string>
-    <string name="tips_help">Clash Meta for Android 是一個&lt;strong>免費應用程式&lt;/strong>並且我們&lt;strong>不&lt;/strong>為其提供任何服務, &lt;strong>請務必不要回報非應用程式自身引起的問題&lt;/strong></string>
+    <string name="tips_help">Flowly 是一個&lt;strong>免費應用程式&lt;/strong>並且我們&lt;strong>不&lt;/strong>為其提供任何服務, &lt;strong>請務必不要回報非應用程式自身引起的問題&lt;/strong></string>
     <string name="tips_properties">僅接受 &lt;strong>Clash 設定檔&lt;/strong> (包含&lt;strong>Proxy&lt;/strong> /&lt;strong>規則&lt;/strong>)</string>
     <string name="toast_profile_updated_complete">Update profile %s completed</string>
     <string name="toast_profile_updated_failed">Update profile %1$s failed: %2$s</string>

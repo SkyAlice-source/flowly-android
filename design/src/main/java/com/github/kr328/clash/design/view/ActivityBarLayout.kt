@@ -15,7 +15,7 @@ class ActivityBarLayout @JvmOverloads constructor(
     @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attributeSet, defStyleAttr, defStyleRes) {
     init {
-        alpha = 0.96f
+        alpha = 1.0f
 
         setBackgroundColor(context.resolveThemedColor(android.R.attr.windowBackground))
     }

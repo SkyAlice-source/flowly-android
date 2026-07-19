@@ -21,9 +21,13 @@ class ActionLabel @JvmOverloads constructor(
         .inflate(context.layoutInflater, this, true)
 
     var icon: Drawable?
-        get() = binding.iconView.background
+        get() = binding.iconView.drawable
         set(value) {
-            binding.iconView.background = value
+            binding.iconView.setImageDrawable(value)
+            val ta = context.obtainStyledAttributes(intArrayOf(androidx.appcompat.R.attr.colorControlNormal))
+            val color = ta.getColor(0, 0)
+            ta.recycle()
+            binding.iconView.imageTintList = android.content.res.ColorStateList.valueOf(color)
         }
 
     var text: CharSequence?

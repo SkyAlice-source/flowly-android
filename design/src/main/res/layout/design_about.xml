@@ -39,12 +39,14 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/about_version_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="@{versionName}"
+                    android:text='@{"v" + versionName}'
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                    android:alpha="0.7" />
+                    android:alpha="0.7"
+                    android:fontFamily="monospace" />
             </LinearLayout>
         </LinearLayout>
 
@@ -73,5 +75,39 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:alpha="0.5"
             android:lineSpacingExtra="4dp" />
+
+        <!-- GitHub link – 居中蓝色可点按钮样式 -->
+        <TextView
+            android:id="@+id/about_github_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@android:drawable/edit_text"
+            android:backgroundTint="?attr/colorSurface"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="@string/about_github_link_text"
+            android:textColor="?colorPrimary"
+            android:textSize="14sp" />
+
+        <!-- Kernel / mihomo link – 同上按钮样式 -->
+        <TextView
+            android:id="@+id/about_kernel_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@android:drawable/edit_text"
+            android:backgroundTint="?attr/colorSurface"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="@string/about_kernel_link_text"
+            android:textColor="?colorPrimary"
+            android:textSize="14sp" />
     </LinearLayout>
 </layout>

@@ -475,7 +475,7 @@
     <string name="theme_light">Светлая</string>
     <string name="theme_system">Системная</string>
     <string name="timeout_error">Таймаут подключения к сервису</string>
-    <string name="tips_help">Clash Meta для Android — &lt;strong>бесплатен&lt;/strong> и мы &lt;strong>НЕ&lt;/strong> предоставляем по нему поддержку</string>
+    <string name="tips_help">Flowly — &lt;strong>бесплатен&lt;/strong> и мы &lt;strong>НЕ&lt;/strong> предоставляем по нему поддержку</string>
     <string name="tips_properties">Принимается только &lt;strong>конфиг Clash&lt;/strong> (включая &lt;strong>Прокси&lt;/strong>/&lt;strong>Правила&lt;/strong>)</string>
     <string name="toast_profile_updated_complete">Update profile %s completed</string>
     <string name="toast_profile_updated_failed">Update profile %1$s failed: %2$s</string>

@@ -150,7 +150,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/main_padding_horizontal"
                     android:layout_marginEnd="@dimen/main_padding_horizontal"
-                    android:alpha="0.96"
+                    android:alpha="1.0"
                     android:background="?android:windowBackground"
                     android:paddingTop="4dp"
                     android:paddingBottom="8dp"
@@ -172,7 +172,7 @@
                     android:id="@+id/elevation_view"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/divider_size"
-                    android:alpha="0.96"
+                    android:alpha="1.0"
                     android:background="?android:windowBackground"
                     android:elevation="@dimen/tab_layout_elevation" />
             </LinearLayout>

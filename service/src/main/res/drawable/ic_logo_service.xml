@@ -4,24 +4,11 @@
     android:viewportWidth="108"
     android:viewportHeight="108"
     android:tint="#FFFFFF">
-    <!-- Flow wave silhouette (white, system tints via colorized) -->
+    <!-- Flowly flame silhouette (monochrome for status bar / tile) -->
     <path
-        android:pathData="M0,60 C20,42 40,42 54,58 C68,74 88,74 108,56 L108,108 L0,108 Z"
+        android:pathData="M54,8 C54,8 38,28 34,44 C30,56 32,68 40,78 C46,86 54,90 54,90 C54,90 62,86 68,78 C76,68 78,56 74,44 C70,28 54,8 54,8 Z"
         android:fillColor="#FFFFFFFF" />
     <path
-        android:pathData="M0,72 C20,58 40,58 54,70 C68,82 88,82 108,68 L108,108 L0,108 Z"
-        android:fillColor="#FFFFFFFF" />
-    <!-- Bubble particles -->
-    <path
-        android:pathData="M38,30 A6,6 0 1,0 38,42 A6,6 0 1,0 38,30 Z"
-        android:fillColor="#FFFFFFFF" />
-    <path
-        android:pathData="M54,25 A4,4 0 1,0 54,33 A4,4 0 1,0 54,25 Z"
-        android:fillColor="#FFFFFFFF" />
-    <path
-        android:pathData="M68,35 A5,5 0 1,0 68,45 A5,5 0 1,0 68,35 Z"
-        android:fillColor="#FFFFFFFF" />
-    <path
-        android:pathData="M46,20 A3,3 0 1,0 46,26 A3,3 0 1,0 46,20 Z"
+        android:pathData="M54,20 C54,20 44,34 42,46 C40,54 42,62 48,70 C50,72 52,74 54,74 C54,74 56,72 58,70 C64,62 66,54 66,46 C64,34 54,20 54,20 Z"
         android:fillColor="#FFFFFFFF" />
 </vector>

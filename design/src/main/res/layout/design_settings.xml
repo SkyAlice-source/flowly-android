@@ -442,7 +442,7 @@
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:src="@drawable/ic_pref_info"
+                        android:src="@drawable/ic_flowly_logo"
                         android:contentDescription="@null"
                         android:importantForAccessibility="no" />
 
@@ -461,11 +461,11 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/about_version_sub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="1dp"
                             android:alpha="0.5"
-                            android:text="@string/version_updated"
                             android:textSize="12sp"
                             android:textColor="?colorControlNormal" />
                     </LinearLayout>
