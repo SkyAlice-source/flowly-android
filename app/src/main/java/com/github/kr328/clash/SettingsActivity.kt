@@ -25,6 +25,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import org.json.JSONArray
+import org.json.JSONObject
 
 class SettingsActivity : BaseActivity<SettingsDesign>() {
 
@@ -262,25 +264,35 @@ class SettingsActivity : BaseActivity<SettingsDesign>() {
     )
 
     private fun findAsset(ctx: Context, releasesJson: String, channel: String): AssetInfo? {
-        val blocks = releasesJson.split("\"id\":").drop(1)
-        var target: String? = null
-        for (b in blocks) {
-            val isPre = """"prerelease"\s*:\s*true""".toRegex().containsMatchIn(b)
+        val arr = JSONArray(releasesJson)
+        var target: JSONObject? = null
+        for (i in 0 until arr.length()) {
+            val rel = arr.getJSONObject(i)
+            val isPre = rel.optBoolean("prerelease", false)
+            val tag = rel.optString("tag_name", "")
             when (channel) {
-                KernelManager.CHANNEL_STABLE -> if (isPre) continue
+                KernelManager.CHANNEL_STABLE -> if (tag != "stable") continue
+                KernelManager.CHANNEL_LATEST -> if (tag != "latest") continue
                 KernelManager.CHANNEL_ALPHA -> if (!isPre) continue
             }
-            target = b
+            target = rel
             break
         }
-        val block = target ?: return null
+        val rel = target ?: return null
 
         val abi = supportedAbi(ctx)
-        val assetUrl = Regex("""browser_download_url"\s*:\s*"([^"]*libbridge-${Regex.escape(abi)}\.so)"""")
-            .find(block)?.groupValues?.get(1) ?: return null
+        val assets = rel.getJSONArray("assets")
+        var assetUrl: String? = null
+        var shaUrl: String? = null
+        for (i in 0 until assets.length()) {
+            val a = assets.getJSONObject(i)
+            when (a.getString("name")) {
+                "libbridge-${abi}.so" -> assetUrl = a.getString("browser_download_url")
+                "sha256.txt" -> shaUrl = a.getString("browser_download_url")
+            }
+        }
+        if (assetUrl == null) return null
 
-        val shaUrl = Regex("""browser_download_url"\s*:\s*"([^"]*sha256\.txt)"""")
-            .find(block)?.groupValues?.get(1)
         val expected = shaUrl?.let { url ->
             runCatching {
                 URL(url).readText().lineSequence()
@@ -291,7 +303,7 @@ class SettingsActivity : BaseActivity<SettingsDesign>() {
 
         // release 命名形如 "Kernel stable · mihomo v1.19.29" → 提取 1.19.29
         val version = Regex("""mihomo\s+v?(\d+\.\d+\.\d+)""")
-            .find(block)?.groupValues?.get(1)
+            .find(rel.optString("name", ""))?.groupValues?.get(1)
 
         return AssetInfo(assetUrl, expected, version)
     }
@@ -302,18 +314,19 @@ class SettingsActivity : BaseActivity<SettingsDesign>() {
     }
 
     private fun parseGithubReleases(json: String): Triple<String, String, String>? {
-        val blocks = json.split("\"id\":").drop(1)
+        val arr = JSONArray(json)
         var stable: String? = null
         var latest: String? = null
         var alpha: String? = null
-        for (b in blocks) {
-            val name = """"name"\s*:\s*"([^"]+)""".toRegex().find(b)?.groupValues?.get(1) ?: continue
-            val isPre = """"prerelease"\s*:\s*true""".toRegex().containsMatchIn(b)
-            if (isPre) {
-                if (alpha == null) alpha = name
-            } else {
-                if (stable == null) stable = name
-                if (latest == null) latest = name
+        for (i in 0 until arr.length()) {
+            val rel = arr.getJSONObject(i)
+            val tag = rel.optString("tag_name", "")
+            val name = rel.optString("name", "N/A")
+            val isPre = rel.optBoolean("prerelease", false)
+            when {
+                tag == "stable" -> if (stable == null) stable = name
+                tag == "latest" -> if (latest == null) latest = name
+                isPre -> if (alpha == null) alpha = name
             }
         }
         if (stable == null && latest == null && alpha == null) return null
