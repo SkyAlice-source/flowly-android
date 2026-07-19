@@ -82,6 +82,12 @@ class ProxyMenu(
             R.id.rule_mode -> {
                 requests.trySend(ProxyDesign.Request.PatchMode(TunnelState.Mode.Rule))
             }
+            R.id.test_all -> {
+                requests.trySend(ProxyDesign.Request.TestAll)
+            }
+            R.id.auto_select_best -> {
+                requests.trySend(ProxyDesign.Request.AutoSelectBest)
+            }
             else -> return false
         }
 

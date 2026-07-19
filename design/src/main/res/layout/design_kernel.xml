@@ -314,6 +314,18 @@
                 app:cornerRadius="16dp" />
         </LinearLayout>
 
+        <!-- Revert to Built-in Kernel (visible only when custom kernel active) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_revert_builtin"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/kernel_revert_builtin"
+            android:textSize="12sp"
+            app:cornerRadius="16dp"
+            android:visibility="gone" />
+
         <!-- Note -->
         <TextView
             android:layout_width="match_parent"

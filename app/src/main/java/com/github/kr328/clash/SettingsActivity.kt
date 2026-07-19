@@ -190,6 +190,28 @@ class SettingsActivity : BaseActivity<SettingsDesign>() {
             kernel.alphaVersion = alphaVer
         }
 
+        // 根据本地已安装的通道更新按钮状态
+        refreshKernelButtonStates(kernel, active)
+
+        // 自定义内核已激活时，显示「恢复内置内核」按钮
+        kernel.btnRevertBuiltin.visibility = if (isCustom) View.VISIBLE else View.GONE
+        kernel.btnRevertBuiltin.setOnClickListener {
+            AlertDialog.Builder(this@SettingsActivity)
+                .setTitle(R.string.kernel_revert_builtin)
+                .setMessage(getString(R.string.kernel_revert_confirm, "v$BUNDLED_KERNEL_VERSION"))
+                .setPositiveButton(R.string.kernel_revert_go) { _, _ ->
+                    KernelManager.clearCustom(this@SettingsActivity)
+                    Toast.makeText(
+                        this@SettingsActivity,
+                        getString(R.string.kernel_revert_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    restartApp()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+
         kernel.btnDownloadStable.setOnClickListener {
             startDownload(it, KernelManager.CHANNEL_STABLE)
         }
@@ -208,36 +230,80 @@ class SettingsActivity : BaseActivity<SettingsDesign>() {
         }
     }
 
+    /**
+     * 根据本地缓存状态更新三个按钮的文案与状态（三态）：
+     * - 当前活跃通道 → "✓ 已安装"（禁用，已在用）
+     * - 已缓存但未激活 → "切换"（点击秒切，不联网）
+     * - 未缓存 → "下载"（点击联网下载）
+     */
+    private fun refreshKernelButtonStates(
+        kernel: DesignKernelBinding,
+        activeChannel: String?
+    ) {
+        val btnStable = kernel.btnDownloadStable
+        val btnLatest = kernel.btnDownloadLatest
+        val btnAlpha = kernel.btnDownloadAlpha
+
+        val installedText = getString(R.string.kernel_installed)
+        val downloadText = getString(R.string.kernel_download)
+        val switchText = getString(R.string.kernel_switch)
+
+        fun setState(btn: com.google.android.material.button.MaterialButton, channel: String) {
+            when {
+                channel == activeChannel -> {
+                    btn.text = installedText; btn.isEnabled = false
+                }
+                KernelManager.isChannelCached(this, channel) -> {
+                    btn.text = switchText; btn.isEnabled = true
+                }
+                else -> {
+                    btn.text = downloadText; btn.isEnabled = true
+                }
+            }
+        }
+        setState(btnStable, KernelManager.CHANNEL_STABLE)
+        setState(btnLatest, KernelManager.CHANNEL_LATEST)
+        setState(btnAlpha, KernelManager.CHANNEL_ALPHA)
+    }
+
     private fun startDownload(btn: View, channel: String) {
         btn.isEnabled = false
         (btn as com.google.android.material.button.MaterialButton).text =
-            getString(R.string.kernel_downloading)
-        launch { downloadAndSwitch(btn, channel) }
+            getString(R.string.kernel_switching)
+        launch { kernelAction(btn, channel) }
     }
 
     /**
-     * Download the rebuilt libbridge.so for [channel] from the Flowly kernel repo,
-     * verify its checksum, install it, then restart the app so the new native
-     * library is loaded on next launch.
+     * 点击某通道按钮的统一入口：
+     * - 若该通道已缓存 → 直接秒切（不联网），重启后生效；
+     * - 否则联网下载、校验、安装，重启后生效。
      */
-    private suspend fun downloadAndSwitch(btn: View, channel: String) {
+    private suspend fun kernelAction(btn: View, channel: String) {
         val ctx = this@SettingsActivity
-        val ok = runCatching {
-            val info = withContext(Dispatchers.IO) {
-                val json = URL(GITHUB_API_RELEASES).readText()
-                findAsset(ctx, json, channel)
-                    ?: throw IllegalStateException(getString(R.string.kernel_no_asset))
-            }
-            withContext(Dispatchers.IO) {
-                KernelManager.install(ctx, channel, info.url, info.sha256) { url, file ->
-                    downloadFile(url, file)
+        val ok = if (KernelManager.isChannelCached(ctx, channel)) {
+            // 本地已缓存：直接切换，无需重新下载
+            KernelManager.switchToCached(ctx, channel)
+        } else {
+            // 未缓存：下载 → 校验 → 安装
+            runCatching {
+                val info = withContext(Dispatchers.IO) {
+                    val json = URL(GITHUB_API_RELEASES).readText()
+                    findAsset(ctx, json, channel)
+                        ?: throw IllegalStateException(getString(R.string.kernel_no_asset))
                 }
-            }
-            // 记录已下载内核的语义版本，供「当前版本」展示
-            if (!info.version.isNullOrBlank()) {
-                KernelManager.setActiveVersion(ctx, info.version)
-            }
-        }.isSuccess
+                withContext(Dispatchers.IO) {
+                    KernelManager.install(ctx, channel, info.url, info.sha256) { url, file ->
+                        downloadFile(url, file)
+                    }
+                }
+                // 记录已下载内核的语义版本，供「当前版本」展示与切回恢复
+                if (!info.version.isNullOrBlank()) {
+                    KernelManager.setActiveVersion(ctx, info.version)
+                    KernelManager.setCachedVersion(ctx, channel, info.version)
+                }
+                true
+            }.getOrElse { false }
+        }
 
         if (ok) {
             (btn as com.google.android.material.button.MaterialButton).text =

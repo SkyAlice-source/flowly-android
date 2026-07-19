@@ -320,6 +320,70 @@
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
+                <!-- Real-time speed chart (visible only while running) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/main_tile_gap"
+                    android:visibility="@{clashRunning ? View.VISIBLE : View.GONE}"
+                    app:cardCornerRadius="@dimen/main_tile_radius"
+                    app:cardElevation="0.5dp"
+                    app:strokeColor="?colorLineSoft"
+                    app:strokeWidth="0.5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="8dp"
+                                android:layout_height="8dp"
+                                android:layout_marginEnd="6dp"
+                                android:background="?colorConnected"
+                                android:contentDescription="@null" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/download"
+                                android:textSize="11sp"
+                                android:textColor="?colorControlNormal"
+                                android:alpha="0.6" />
+
+                            <View
+                                android:layout_width="8dp"
+                                android:layout_height="8dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginEnd="6dp"
+                                android:background="?colorPrimary"
+                                android:contentDescription="@null" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/upload"
+                                android:textSize="11sp"
+                                android:textColor="?colorControlNormal"
+                                android:alpha="0.6" />
+                        </LinearLayout>
+
+                        <com.github.kr328.clash.design.view.SpeedChartView
+                            android:id="@+id/speed_chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="64dp"
+                            android:layout_marginTop="8dp"
+                            android:contentDescription="@string/speed_chart_desc" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

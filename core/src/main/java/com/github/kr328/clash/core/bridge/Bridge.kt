@@ -60,17 +60,32 @@ object Bridge {
     private external fun nativeInit(home: String, versionName: String, sdkVersion: Int)
 
     private fun loadNativeLibrary() {
-        val custom = File(Global.application.filesDir, "kernel/libbridge.so")
-        if (custom.exists() && custom.length() > 1_000_000L) {
-            try {
-                System.load(custom.absolutePath)
-                Log.i("Bridge: loaded custom kernel from ${custom.absolutePath}")
-                return
-            } catch (e: Throwable) {
-                Log.e("Bridge: failed to load custom kernel, falling back to bundled", e)
+        // Flowly 下载内核模型：每个通道的 libbridge.so 缓存在 kernel/cache/<channel>.so，
+        // 激活通道记录在 kernel/active 文本文件。Bridge 启动时按标记加载对应缓存；
+        // 无标记则回退到内置 bundled 库。
+        // 注意：下载的 libbridge.so 是约 70-85KB 的小型 JNI 桥，不是 MB 级核心包，
+        // 故用 10KB 下限（旧代码 1MB 阈值会拒绝每一个合法下载）。
+        val filesDir = Global.application.filesDir
+        val marker = File(filesDir, "kernel/active")
+        var loaded = false
+        if (marker.exists()) {
+            val channel = marker.readText().trim()
+            if (channel == "stable" || channel == "latest" || channel == "alpha") {
+                val so = File(filesDir, "kernel/cache/$channel.so")
+                if (so.exists() && so.length() > 10_000L) {
+                    try {
+                        System.load(so.absolutePath)
+                        Log.i("Bridge: loaded custom $channel kernel from ${so.absolutePath}")
+                        loaded = true
+                    } catch (e: Throwable) {
+                        Log.e("Bridge: failed to load custom $channel kernel, falling back to bundled", e)
+                    }
+                }
             }
         }
-        System.loadLibrary("bridge")
+        if (!loaded) {
+            System.loadLibrary("bridge")
+        }
     }
 
     init {

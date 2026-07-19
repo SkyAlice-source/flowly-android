@@ -33,6 +33,8 @@ class ProxyDesign(
         object ReloadAll : Request()
         object ReLaunch : Request()
         object OpenProfiles : Request()
+        object TestAll : Request()
+        object AutoSelectBest : Request()
 
         data class PatchMode(val mode: TunnelState.Mode?) : Request()
         data class Reload(val index: Int) : Request()
@@ -63,6 +65,9 @@ class ProxyDesign(
             adapter.states[binding.pagesView.currentItem].urlTesting = value
         }
 
+    val currentPageIndex: Int
+        get() = binding.pagesView.currentItem
+
     override val root: View = binding.root
 
     suspend fun updateGroup(
@@ -79,7 +84,7 @@ class ProxyDesign(
         updateUrlTestButtonStatus()
     }
 
-    suspend fun requestRedrawVisible() {
+    suspend     fun requestRedrawVisible() {
         withContext(Dispatchers.Main) {
             adapter.requestRedrawVisible()
         }
@@ -137,6 +142,9 @@ class ProxyDesign(
 
                     override fun onPageSelected(position: Int) {
                         uiStore.proxyLastGroup = groupNames[position]
+
+                        // Lazy load: fetch proxies for the newly visible group
+                        requests.trySend(Request.Reload(position))
                     }
                 })
             }
@@ -150,6 +158,10 @@ class ProxyDesign(
             binding.pagesView.post {
                 if (initialPosition > 0)
                     binding.pagesView.setCurrentItem(initialPosition, false)
+
+                // Lazy load: only fetch the initially visible group
+                val pos = if (initialPosition >= 0) initialPosition else 0
+                requests.trySend(Request.Reload(pos))
             }
         }
     }

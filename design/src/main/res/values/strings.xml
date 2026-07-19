@@ -114,6 +114,14 @@
     <string name="kernel_download_success">Downloaded. Restart to apply.</string>
     <string name="kernel_download_failed">Download failed. Check network or try again.</string>
     <string name="kernel_no_asset">No compatible kernel found for this device.</string>
+    <string name="kernel_installed">✓ Installed</string>
+    <string name="kernel_switch">Switch</string>
+    <string name="kernel_switching">Switching…</string>
+    <string name="kernel_reinstall">Re-download</string>
+    <string name="kernel_revert_builtin">Revert to built-in kernel</string>
+    <string name="kernel_revert_confirm">Revert to the built-in kernel (%1$s)? Your downloaded kernels stay cached locally and can be switched back instantly anytime.</string>
+    <string name="kernel_revert_go">Revert</string>
+    <string name="kernel_revert_success">Reverted to built-in kernel. Restarting…</string>
     <string name="at_least_15_minutes">At least 15 minutes or empty</string>
     <string name="authentication">Authentication</string>
     <string name="auto_restart">Auto Restart</string>
@@ -186,6 +194,8 @@
     <string name="default_name_server">Default Name Server</string>
     <string name="delay">Delay</string>
     <string name="delay_test">Delay Test</string>
+    <string name="test_all">Test All</string>
+    <string name="auto_select_best">Auto Select Best</string>
     <string name="delete">Delete</string>
     <string name="delete_all_logs">Delete All Logs</string>
     <string name="delete_all_logs_warn">All historical logs will *LOST*</string>
@@ -203,6 +213,7 @@
     <string name="dont_modify">Do not modify</string>
     <string name="doubles">Double</string>
     <string name="download">Download</string>
+    <string name="speed_chart_desc">Real-time download and upload speed chart</string>
     <string name="duplicate">Duplicate</string>
     <string name="edit">Edit</string>
     <string name="expire">Expire</string>
@@ -555,7 +566,6 @@
     <string name="system_proxy_summary">Attach http proxy to VpnService</string>
     <string name="tap_to_start">Tap below to start</string>
     <string name="tcp_concurrent">TCP Concurrent</string>
-    <string name="test_all">Test All</string>
     <string name="theme">Theme</string>
     <string name="theme_auto">Follow System</string>
     <string name="theme_dark">Dark</string>
@@ -600,4 +610,8 @@
     <string name="whitelist">White List</string>
     <string name="theme_toggle">Toggle dark mode</string>
     <string name="network_status_dial">Connection status dial</string>
+    <string name="battery_opt_title">Keep connection in background</string>
+    <string name="battery_opt_message">After you switch apps, Android may restrict Flowly and drop the VPN connection. To keep it running, set Flowly to "Unrestricted" in battery settings.</string>
+    <string name="battery_opt_go">Open settings</string>
+    <string name="battery_opt_later">Not now</string>
 </resources>
