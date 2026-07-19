@@ -27,7 +27,10 @@ object KernelManager {
     private const val PREFS = "flowly_kernel"
     private const val KEY_ACTIVE = "active_channel"
     private const val KEY_VERSION = "active_version"
-    private const val MIN_SO_BYTES = 1_000_000L
+    // Flowly's downloadable libbridge.so is a small JNI bridge (~70-85 KB across
+    // ABIs), NOT a multi-MB core blob. The old 1 MB floor rejected every valid
+    // download. 10 KB is a sane sanity floor that still rejects empty/truncated files.
+    private const val MIN_SO_BYTES = 10_000L
 
     private fun prefs(ctx: Context): SharedPreferences =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -44,7 +47,9 @@ object KernelManager {
         prefs(ctx).getString(KEY_ACTIVE, null)
 
     fun setActiveChannel(ctx: Context, channel: String?) {
-        prefs(ctx).edit().putString(KEY_ACTIVE, channel).apply()
+        // commit() (not apply) so the value is flushed to disk before restartApp()
+        // calls System.exit — otherwise the async apply() may never persist.
+        prefs(ctx).edit().putString(KEY_ACTIVE, channel).commit()
     }
 
     /** 已下载内核的 mihomo 语义版本（如 "1.19.29"），用于「当前版本」展示 */
@@ -52,7 +57,7 @@ object KernelManager {
         prefs(ctx).getString(KEY_VERSION, null)
 
     fun setActiveVersion(ctx: Context, version: String?) {
-        prefs(ctx).edit().putString(KEY_VERSION, version).apply()
+        prefs(ctx).edit().putString(KEY_VERSION, version).commit()
     }
 
     /**
