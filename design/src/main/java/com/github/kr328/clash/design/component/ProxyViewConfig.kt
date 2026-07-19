@@ -13,8 +13,21 @@ class ProxyViewConfig(val context: Context, var proxyLine: Int) {
     val clickableBackground =
         context.resolveThemedResourceId(android.R.attr.selectableItemBackground)
 
-    val selectedControl = context.resolveThemedColor(com.google.android.material.R.attr.colorOnPrimary)
-    val selectedBackground = context.resolveThemedColor(com.google.android.material.R.attr.colorPrimary)
+    val selectedControl = context.resolveThemedColor(com.google.android.material.R.attr.colorPrimary)
+
+    /** Soft tint of brand colour for selection highlight (≈15% primary on surface).
+     *  Replaces the old solid-colour fill that looked visually "jarring". */
+    private val primaryForSelection = context.resolveThemedColor(com.google.android.material.R.attr.colorPrimary)
+
+    val selectedBackground: Int
+        get() = run {
+            val ratio = 0.15f
+            Color.rgb(
+                (Color.red(colorSurface) + (Color.red(primaryForSelection) - Color.red(colorSurface)) * ratio).toInt(),
+                (Color.green(colorSurface) + (Color.green(primaryForSelection) - Color.green(colorSurface)) * ratio).toInt(),
+                (Color.blue(colorSurface) + (Color.blue(primaryForSelection) - Color.blue(colorSurface)) * ratio).toInt(),
+            )
+        }
 
     val unselectedControl = context.resolveThemedColor(com.google.android.material.R.attr.colorOnSurface)
     val unselectedBackground: Int

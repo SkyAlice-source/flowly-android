@@ -84,6 +84,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
                 handler.post(durationRunnable)
             } else {
                 handler.removeCallbacks(durationRunnable)
+                binding.speedChart.clear()
             }
             updateDial()
             updateStatusMeta()
@@ -121,6 +122,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
             binding.uploadSpeed = upSpeed.formatSpeed()
             binding.downloadSpeed = downSpeed.formatSpeed()
             binding.forwardedSpeed = (upSpeed + downSpeed).formatSpeed()
+            binding.speedChart.appendSample(downSpeed, upSpeed)
             updateDial()
         }
     }

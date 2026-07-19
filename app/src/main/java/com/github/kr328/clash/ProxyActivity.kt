@@ -1,6 +1,7 @@
 package com.github.kr328.clash
 
 import com.github.kr328.clash.common.util.intent
+import com.github.kr328.clash.common.util.ticker
 import com.github.kr328.clash.core.Clash
 import com.github.kr328.clash.core.model.Proxy
 import com.github.kr328.clash.design.ProxyDesign
@@ -11,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import java.util.concurrent.TimeUnit
 
 class ProxyActivity : BaseActivity<ProxyDesign>() {
     override suspend fun main() {
@@ -29,7 +31,10 @@ class ProxyActivity : BaseActivity<ProxyDesign>() {
 
         setContentDesign(design)
 
-        design.requests.send(ProxyDesign.Request.ReloadAll)
+        // Lazy load: don't load all groups on entry; only the initially visible page
+        // will be loaded by ProxyDesign.init(). Subsequent pages load on swipe (onPageSelected).
+
+        val refreshTicker = ticker(TimeUnit.SECONDS.toMillis(15))
 
         while (isActive) {
             select<Unit> {
@@ -99,6 +104,36 @@ class ProxyActivity : BaseActivity<ProxyDesign>() {
                                 design.requests.send(ProxyDesign.Request.Reload(it.index))
                             }
                         }
+                        is ProxyDesign.Request.TestAll -> {
+                            launch {
+                                // healthCheckAll not in IClashManager; loop over groups
+                                names.forEach { name ->
+                                    withClash { healthCheck(name) }
+                                }
+
+                                // After all groups finish testing, reload visible data
+                                names.indices.forEach { idx ->
+                                    design.requests.send(ProxyDesign.Request.Reload(idx))
+                                }
+                            }
+                        }
+                        is ProxyDesign.Request.AutoSelectBest -> {
+                            // Auto-select the proxy with lowest delay on current page
+                            val idx = design.currentPageIndex.coerceIn(0, names.lastIndex)
+                            withClash {
+                                val candidates = queryProxyGroup(names[idx], uiStore.proxySort).proxies
+                                if (candidates.isNotEmpty()) {
+                                    val best = candidates
+                                        .filter { it.delay > 0 }
+                                        .minByOrNull { it.delay }
+                                        ?: candidates.first()
+
+                                    patchSelector(names[idx], best.name)
+                                    states[idx].now = best.name
+                                }
+                            }
+                            design.requestRedrawVisible()
+                        }
                         is ProxyDesign.Request.OpenProfiles -> {
                             startActivity(ProfilesActivity::class.intent)
                             finish()
@@ -114,6 +149,13 @@ class ProxyActivity : BaseActivity<ProxyDesign>() {
                                 patchOverride(Clash.OverrideSlot.Session, o)
                             }
                         }
+                    }
+                }
+                // Auto-refresh: every 15s, reload current visible page's delay data
+                if (names.isNotEmpty()) {
+                    refreshTicker.onReceive {
+                        val idx = design.currentPageIndex.coerceIn(0, names.lastIndex)
+                        design.requests.trySend(ProxyDesign.Request.Reload(idx))
                     }
                 }
             }

@@ -90,14 +90,25 @@ class PropertiesActivity : BaseActivity<PropertiesDesign>() {
             }
             else -> {
                 try {
-                    withProcessing { updateStatus ->
-                        withProfile {
-                            patch(profile.uuid, profile.name, profile.source, profile.interval, profile.ageSecretKey)
+                    // Fast path: if only the display name changed (source/interval/secret unchanged),
+                    // rename in DB only — no re-fetch of subscription content.
+                    val nameOnlyChange = profile.source == original.source &&
+                        profile.interval == original.interval &&
+                        profile.ageSecretKey == original.ageSecretKey &&
+                        profile.name != original.name
 
-                            coroutineScope {
-                                commit(profile.uuid) {
-                                    launch {
-                                        updateStatus(it)
+                    if (nameOnlyChange) {
+                        withProfile { rename(profile.uuid, profile.name) }
+                    } else {
+                        withProcessing { updateStatus ->
+                            withProfile {
+                                patch(profile.uuid, profile.name, profile.source, profile.interval, profile.ageSecretKey)
+
+                                coroutineScope {
+                                    commit(profile.uuid) {
+                                        launch {
+                                            updateStatus(it)
+                                        }
                                     }
                                 }
                             }

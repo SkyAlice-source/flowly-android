@@ -131,6 +131,25 @@ class ProfileManager(private val context: Context) : IProfileManager,
         scheduleUpdate(uuid, true)
     }
 
+    override suspend fun rename(uuid: UUID, name: String) {
+        // Fast path: only update display name in DB, no re-fetch
+        val pending = PendingDao().queryByUUID(uuid)
+
+        if (pending != null) {
+            PendingDao().update(pending.copy(name = name))
+        }
+
+        val imported = ImportedDao().queryByUUID(uuid)
+
+        if (imported != null) {
+            ImportedDao().update(imported.copy(name = name))
+        }
+
+        if (pending != null || imported != null) {
+            context.sendProfileChanged(uuid)
+        }
+    }
+
     override suspend fun commit(uuid: UUID, callback: IFetchObserver?) {
         ProfileProcessor.apply(context, uuid, callback)
 

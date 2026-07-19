@@ -57,4 +57,12 @@
             </group>
         </menu>
     </item>
+    <item
+        android:id="@+id/test_all"
+        android:icon="@drawable/ic_baseline_speed"
+        android:title="@string/test_all" />
+    <item
+        android:id="@+id/auto_select_best"
+        android:icon="@drawable/ic_baseline_target"
+        android:title="@string/auto_select_best" />
 </menu>

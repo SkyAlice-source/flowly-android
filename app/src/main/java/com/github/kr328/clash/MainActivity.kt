@@ -1,9 +1,14 @@
 package com.github.kr328.clash
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityCompat
@@ -23,6 +28,7 @@ import com.github.kr328.clash.util.startClashService
 import com.github.kr328.clash.util.stopClashService
 import com.github.kr328.clash.util.withClash
 import com.github.kr328.clash.util.withProfile
+import com.github.kr328.clash.store.BatteryOptStore
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 import java.util.concurrent.TimeUnit
@@ -60,9 +66,13 @@ class MainActivity : BaseActivity<MainDesign>() {
             select<Unit> {
                 events.onReceive {
                     when (it) {
+                        Event.ClashStart -> {
+                            design.fetch()
+                            promptBatteryOptimizationIfNeeded()
+                        }
                         Event.ActivityStart,
                         Event.ServiceRecreated,
-                        Event.ClashStop, Event.ClashStart,
+                        Event.ClashStop,
                         Event.ProfileLoaded, Event.ProfileChanged -> design.fetch()
                         else -> Unit
                     }
@@ -209,6 +219,49 @@ class MainActivity : BaseActivity<MainDesign>() {
     private fun queryAppVersionName(): String {
         val str = packageManager.getPackageInfo(packageName, 0).versionName
         return str ?: "???"
+    }
+
+    /**
+     * Nudge the user (once) to exempt Flowly from battery optimization so the
+     * foreground VPN service survives being sent to the background. Triggered
+     * on ClashStart, after VPN permission is already granted.
+     */
+    private fun promptBatteryOptimizationIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (powerManager.isIgnoringBatteryOptimizations(packageName)) return
+
+        val store = BatteryOptStore(this)
+        if (store.promptShown) return
+        store.promptShown = true
+
+        AlertDialog.Builder(this).apply {
+            setTitle(DesignR.string.battery_opt_title)
+            setMessage(DesignR.string.battery_opt_message)
+            setPositiveButton(DesignR.string.battery_opt_go) { _, _ -> openBatterySettings() }
+            setNegativeButton(DesignR.string.battery_opt_later) { _, _ -> }
+            setCancelable(true)
+            show()
+        }
+    }
+
+    private fun openBatterySettings() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        try {
+            // Deep link straight to Flowly's battery-optimization entry.
+            startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+            })
+        } catch (_: Exception) {
+            // Some vendors (Xiaomi/Huawei/...) don't resolve that intent — fall
+            // back to the generic battery-optimization list.
+            try {
+                startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+            } catch (_: Exception) {
+                // Last resort: nothing we can do, silently skip.
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
