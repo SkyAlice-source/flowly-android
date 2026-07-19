@@ -42,11 +42,15 @@
                     android:orientation="horizontal"
                     android:paddingVertical="@dimen/item_padding_vertical">
 
-                    <View
+                    <ImageView
                         android:layout_width="@dimen/tips_icon_size"
                         android:layout_height="@dimen/tips_icon_size"
                         android:layout_marginHorizontal="@dimen/tips_icon_margin"
-                        android:background="@drawable/ic_outline_info" />
+                        android:background="@drawable/bg_settings_icon"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_outline_info"
+                        app:tint="?attr/colorControlNormal"
+                        android:contentDescription="@null" />
 
                     <TextView
                         android:id="@+id/tips"

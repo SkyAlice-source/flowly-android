@@ -83,20 +83,20 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/main_padding_horizontal"
-            android:paddingTop="6.0dp"
+            android:paddingTop="8dp"
             android:paddingRight="@dimen/main_padding_horizontal"
-            android:paddingBottom="6.0dp">
+            android:paddingBottom="8dp">
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="0.0dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5.0dp"
-                android:layout_weight="1.0"
+                android:layout_weight="1"
+                android:layout_marginEnd="5dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?android:selectableItemBackground"
                 android:onClick="@{() -> self.requestCreateUrl()}"
-                app:cardCornerRadius="15.0dp"
+                app:cardCornerRadius="@dimen/main_tile_radius"
                 app:cardElevation="0.5dp"
                 app:strokeColor="?colorLineSoft"
                 app:strokeWidth="0.5dp">
@@ -106,13 +106,13 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="14.0dp">
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp">
 
                     <ImageView
-                        android:layout_width="30.0dp"
-                        android:layout_height="30.0dp"
-                        android:background="@drawable/bg_settings_icon"
-                        android:padding="7.0dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:padding="0dp"
                         android:src="@drawable/ic_baseline_publish"
                         app:tint="?colorPrimary"
                         android:contentDescription="@null"
@@ -121,25 +121,25 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="7.0dp"
+                        android:layout_marginTop="7dp"
                         android:text="@string/import_from_url"
-                        android:textColor="?colorControlNormal"
-                        android:textSize="12.0sp"
-                        android:textStyle="bold" />
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="?colorControlNormal" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="0.0dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5.0dp"
-                android:layout_marginRight="5.0dp"
-                android:layout_weight="1.0"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?android:selectableItemBackground"
                 android:onClick="@{() -> self.requestCreateFile()}"
-                app:cardCornerRadius="15.0dp"
+                app:cardCornerRadius="@dimen/main_tile_radius"
                 app:cardElevation="0.5dp"
                 app:strokeColor="?colorLineSoft"
                 app:strokeWidth="0.5dp">
@@ -149,13 +149,13 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="14.0dp">
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp">
 
                     <ImageView
-                        android:layout_width="30.0dp"
-                        android:layout_height="30.0dp"
-                        android:background="@drawable/bg_settings_icon"
-                        android:padding="7.0dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:padding="0dp"
                         android:src="@drawable/ic_baseline_attach_file"
                         app:tint="?colorPrimary"
                         android:contentDescription="@null"
@@ -164,24 +164,24 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="7.0dp"
+                        android:layout_marginTop="7dp"
                         android:text="@string/import_from_file"
-                        android:textColor="?colorControlNormal"
-                        android:textSize="12.0sp"
-                        android:textStyle="bold" />
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="?colorControlNormal" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="0.0dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5.0dp"
-                android:layout_weight="1.0"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?android:selectableItemBackground"
                 android:onClick="@{() -> self.requestCreateQR()}"
-                app:cardCornerRadius="15.0dp"
+                app:cardCornerRadius="@dimen/main_tile_radius"
                 app:cardElevation="0.5dp"
                 app:strokeColor="?colorLineSoft"
                 app:strokeWidth="0.5dp">
@@ -191,13 +191,13 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="14.0dp">
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp">
 
                     <ImageView
-                        android:layout_width="30.0dp"
-                        android:layout_height="30.0dp"
-                        android:background="@drawable/bg_settings_icon"
-                        android:padding="7.0dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:padding="0dp"
                         android:src="@drawable/ic_baseline_adb"
                         app:tint="?colorPrimary"
                         android:contentDescription="@null"
@@ -206,21 +206,22 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="7.0dp"
+                        android:layout_marginTop="7dp"
                         android:text="@string/import_from_qr"
-                        android:textColor="?colorControlNormal"
-                        android:textSize="12.0sp"
-                        android:textStyle="bold" />
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="?colorControlNormal" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
 
-        <include
-            android:id="@+id/main_list"
-            layout="@layout/common_recycler_list"
+        <com.github.kr328.clash.design.view.AppRecyclerView
+            android:id="@+id/recycler_list"
             android:layout_width="match_parent"
             android:layout_height="0.0dp"
             android:layout_weight="1.0"
-            app:insets="@{self.surface.insets}" />
+            android:clipToPadding="false"
+            android:paddingBottom="@{self.surface.insets.bottom}" />
     </LinearLayout>
 </layout>

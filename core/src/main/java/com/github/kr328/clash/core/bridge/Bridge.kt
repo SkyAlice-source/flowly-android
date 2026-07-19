@@ -59,8 +59,22 @@ object Bridge {
 
     private external fun nativeInit(home: String, versionName: String, sdkVersion: Int)
 
-    init {
+    private fun loadNativeLibrary() {
+        val custom = File(Global.application.filesDir, "kernel/libbridge.so")
+        if (custom.exists() && custom.length() > 1_000_000L) {
+            try {
+                System.load(custom.absolutePath)
+                Log.i("Bridge: loaded custom kernel from ${custom.absolutePath}")
+                return
+            } catch (e: Throwable) {
+                Log.e("Bridge: failed to load custom kernel, falling back to bundled", e)
+            }
+        }
         System.loadLibrary("bridge")
+    }
+
+    init {
+        loadNativeLibrary()
 
         val ctx = Global.application
 

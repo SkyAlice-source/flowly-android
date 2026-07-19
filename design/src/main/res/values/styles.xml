@@ -171,8 +171,8 @@
         <item name="colorSurface">@color/color_dark_surface</item>
         <item name="colorSurface2">@color/color_dark_surface_2</item>
         <item name="fullScreenDialogTheme">@style/AppFullScreenDialogDark</item>
-        <item name="android:fontFamily">@font/flowly_body</item>
-        <item name="fontFamily">@font/flowly_body</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
     </style>
     <style name="AppThemeLight" parent="@style/AppThemeLightBase">
         <item name="android:statusBarColor">@color/color_system_ui_overlay</item>
@@ -203,8 +203,8 @@
         <item name="colorSecondary">?colorPrimary</item>
         <item name="colorSurface2">@color/color_light_surface_2</item>
         <item name="fullScreenDialogTheme">@style/AppFullScreenDialogLight</item>
-        <item name="android:fontFamily">@font/flowly_body</item>
-        <item name="fontFamily">@font/flowly_body</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
     </style>
     <style name="Base.AlertDialog.AppCompat" parent="@android:style/Widget">
         <item name="android:layout">@layout/abc_alert_dialog_material</item>
@@ -2672,7 +2672,13 @@
         <item name="suffixTextColor">@color/mtrl_indicator_text_color</item>
     </style>
     <style name="Base.Widget.MaterialComponents.TextView" parent="@style/Widget.AppCompat.TextView" />
-    <style name="BootstrapTheme" parent="@style/AppThemeLight" />
+    <style name="BootstrapTheme" parent="@style/AppThemeLight">
+        <!-- Branded splash (Android 12+). Matches app light bg, shows Flowly flame + wordmark. -->
+        <item name="android:windowSplashScreenBackground">@color/color_light_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="android:windowSplashScreenAnimationDuration">100</item>
+        <item name="android:windowSplashScreenBrandingImage">@drawable/ic_splash_wordmark</item>
+    </style>
     <style name="CardView" parent="@style/Base.CardView" />
     <style name="CardView.Dark" parent="@style/CardView">
         <item name="cardBackgroundColor">@color/cardview_dark_background</item>

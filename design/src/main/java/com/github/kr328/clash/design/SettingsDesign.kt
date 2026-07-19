@@ -35,4 +35,9 @@ class SettingsDesign(context: Context) : Design<SettingsDesign.Request>(context)
     fun setLanguage(display: String) {
         binding.languageSub.text = display
     }
+
+    /** 设置页「关于」项副标题：显示应用版本号（替代原先的「已更新」） */
+    fun setVersion(version: String) {
+        binding.aboutVersionSub.text = version
+    }
 }
