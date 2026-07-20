@@ -17,6 +17,7 @@ import com.github.kr328.clash.design.databinding.DesignAboutBinding
 import com.github.kr328.clash.design.databinding.DesignKernelBinding
 import com.github.kr328.clash.kernel.KernelManager
 import com.github.kr328.clash.util.LocaleHelper
+import com.github.kr328.clash.util.VendorBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -105,6 +106,8 @@ class SettingsActivity : BaseActivity<SettingsDesign>() {
                             startActivity(ProfilesActivity::class.intent)
                             finish()
                         }
+                        SettingsDesign.Request.OpenBackground ->
+                            VendorBackground.openBackgroundSettings(this@SettingsActivity)
                         SettingsDesign.Request.About -> {
                             val versionName = runCatching {
                                 packageManager.getPackageInfo(packageName, 0).versionName

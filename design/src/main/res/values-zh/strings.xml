@@ -455,7 +455,13 @@
     <string name="warning">警告</string>
     <string name="whitelist">白名单</string>
     <string name="battery_opt_title">保持后台连接</string>
-    <string name="battery_opt_message">切到后台后，系统可能会限制 Flowly 并中断连接。建议将 Flowly 在电池设置中设为「不受限制」，以保持后台常驻。</string>
+    <string name="battery_opt_message">切到后台后，系统可能会限制 Flowly 并中断连接。建议允许 Flowly 自启动、在后台运行，并将耗电策略设为「无限制」。</string>
     <string name="battery_opt_go">去设置</string>
     <string name="battery_opt_later">暂不</string>
+    <string name="settings_section_system">系统</string>
+    <string name="bg_settings">后台运行设置</string>
+    <string name="bg_settings_sub">自启动、电池与后台运行权限</string>
+    <string name="bg_vendor_title">连接曾被系统中断</string>
+    <string name="bg_vendor_message">Flowly 在后台被系统停止，连接已自动恢复。若要避免再次中断，请在接下来的页面中允许 Flowly 自启动并在后台运行。</string>
+    <string name="bg_recovered_toast">连接被系统中断，已自动恢复</string>
 </resources>

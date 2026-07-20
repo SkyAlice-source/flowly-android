@@ -11,7 +11,7 @@ import com.github.kr328.clash.design.util.root
 class SettingsDesign(context: Context) : Design<SettingsDesign.Request>(context) {
     enum class Request {
         StartApp, StartNetwork, StartOverride, StartMetaFeature,
-        SetLanguage, OpenDashboard, OpenProxy, OpenProfiles, About, Kernel,
+        SetLanguage, OpenDashboard, OpenProxy, OpenProfiles, OpenBackground, About, Kernel,
     }
 
     private val binding = DesignSettingsBinding

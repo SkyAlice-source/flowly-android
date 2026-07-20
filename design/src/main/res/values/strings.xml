@@ -611,7 +611,13 @@
     <string name="theme_toggle">Toggle dark mode</string>
     <string name="network_status_dial">Connection status dial</string>
     <string name="battery_opt_title">Keep connection in background</string>
-    <string name="battery_opt_message">After you switch apps, Android may restrict Flowly and drop the VPN connection. To keep it running, set Flowly to "Unrestricted" in battery settings.</string>
+    <string name="battery_opt_message">After you switch apps, the system may restrict Flowly and drop the VPN connection. Allow Flowly to auto-start and run in the background, and set its battery usage to "Unrestricted".</string>
     <string name="battery_opt_go">Open settings</string>
     <string name="battery_opt_later">Not now</string>
+    <string name="settings_section_system">System</string>
+    <string name="bg_settings">Background running</string>
+    <string name="bg_settings_sub">Auto-start, battery and background permissions</string>
+    <string name="bg_vendor_title">Connection was interrupted</string>
+    <string name="bg_vendor_message">The system stopped Flowly while it was running in the background, and the connection has been restored automatically. To prevent this from happening again, allow Flowly to auto-start and run in the background on the next page.</string>
+    <string name="bg_recovered_toast">Connection was interrupted by the system and has been restored</string>
 </resources>

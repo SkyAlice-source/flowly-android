@@ -4,11 +4,9 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
-import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityCompat
@@ -28,7 +26,9 @@ import com.github.kr328.clash.util.startClashService
 import com.github.kr328.clash.util.stopClashService
 import com.github.kr328.clash.util.withClash
 import com.github.kr328.clash.util.withProfile
+import com.github.kr328.clash.service.StatusProvider
 import com.github.kr328.clash.store.BatteryOptStore
+import com.github.kr328.clash.util.VendorBackground
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 import java.util.concurrent.TimeUnit
@@ -59,6 +59,12 @@ class MainActivity : BaseActivity<MainDesign>() {
             design.showToast(res, ToastDuration.Short)
             pendingThemeToast = null
         }
+
+        // 后台被杀自动恢复：lock 文件仍标记「应处于连接态」（用户未主动断开），
+        // 但服务已不在 —— 说明 :background 进程被系统/厂商后台管理杀掉。
+        // 此时静默重连（VPN 已授权，VpnService.prepare() 返回 null，不会弹确认框），
+        // 并借机引导用户去厂商的后台运行设置页，从根上减少被杀。
+        recoverIfKilledInBackground(design)
 
         val ticker = ticker(TimeUnit.SECONDS.toMillis(1))
 
@@ -222,9 +228,56 @@ class MainActivity : BaseActivity<MainDesign>() {
     }
 
     /**
-     * Nudge the user (once) to exempt Flowly from battery optimization so the
-     * foreground VPN service survives being sent to the background. Triggered
-     * on ClashStart, after VPN permission is already granted.
+     * 检测并恢复「后台被系统杀掉」的连接。
+     *
+     * 判定依据：[StatusProvider.shouldStartClashOnBoot]（service_running.lock）
+     * 在用户主动断开时会被删除，因此它为 true 而 [clashRunning] 为 false，
+     * 只可能是服务进程被系统强杀。恢复动作对用户静默（VPN 授权仍然有效）。
+     */
+    private suspend fun recoverIfKilledInBackground(design: MainDesign) {
+        if (!StatusProvider.shouldStartClashOnBoot) return
+        if (clashRunning) return
+
+        val vpnRequest = startClashService()
+        if (vpnRequest != null) {
+            // 极少见：VPN 授权被系统撤销，需要用户重新确认
+            vpnRequestLauncher.launch(vpnRequest)
+            return
+        }
+
+        design.showToast(DesignR.string.bg_recovered_toast, ToastDuration.Long)
+        promptVendorBackgroundIfNeeded()
+    }
+
+    /**
+     * 检测到后台被杀后，引导用户去厂商的后台运行管理页（只弹一次）。
+     * 已经豁免电池优化的用户大概率已配好权限，不再打扰。
+     */
+    private fun promptVendorBackgroundIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (powerManager.isIgnoringBatteryOptimizations(packageName)) return
+
+        val store = BatteryOptStore(this)
+        if (store.vendorPromptShown) return
+        store.vendorPromptShown = true
+
+        AlertDialog.Builder(this).apply {
+            setTitle(DesignR.string.bg_vendor_title)
+            setMessage(DesignR.string.bg_vendor_message)
+            setPositiveButton(DesignR.string.battery_opt_go) { _, _ -> openVendorBackgroundSettings() }
+            setNegativeButton(DesignR.string.battery_opt_later) { _, _ -> }
+            setCancelable(true)
+            show()
+        }
+    }
+
+    /**
+     * Nudge the user (once) to keep Flowly alive in the background after the
+     * first successful connect. On OEM ROMs the standard battery page is often
+     * not the real kill switch, so the button opens the vendor-specific
+     * background/auto-start page (with battery/app-details fallbacks).
      */
     private fun promptBatteryOptimizationIfNeeded() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
@@ -239,29 +292,15 @@ class MainActivity : BaseActivity<MainDesign>() {
         AlertDialog.Builder(this).apply {
             setTitle(DesignR.string.battery_opt_title)
             setMessage(DesignR.string.battery_opt_message)
-            setPositiveButton(DesignR.string.battery_opt_go) { _, _ -> openBatterySettings() }
+            setPositiveButton(DesignR.string.battery_opt_go) { _, _ -> openVendorBackgroundSettings() }
             setNegativeButton(DesignR.string.battery_opt_later) { _, _ -> }
             setCancelable(true)
             show()
         }
     }
 
-    private fun openBatterySettings() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
-        try {
-            // Deep link straight to Flowly's battery-optimization entry.
-            startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                data = Uri.parse("package:$packageName")
-            })
-        } catch (_: Exception) {
-            // Some vendors (Xiaomi/Huawei/...) don't resolve that intent — fall
-            // back to the generic battery-optimization list.
-            try {
-                startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-            } catch (_: Exception) {
-                // Last resort: nothing we can do, silently skip.
-            }
-        }
+    private fun openVendorBackgroundSettings() {
+        VendorBackground.openBackgroundSettings(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
