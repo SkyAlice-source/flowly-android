@@ -16,6 +16,8 @@
         tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- 让「后台运行设置」入口能直接跳转到本应用的电池优化关闭页（normal 权限，Flowly 走 GitHub 分发不上架 Play，无政策风险） -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <!-- Workaround for Android 17+ cross profile loopback networking restrictions.
          This permission allows CMFA to connect to loopback addresses and ports bound

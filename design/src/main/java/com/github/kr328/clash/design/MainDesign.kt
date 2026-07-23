@@ -41,6 +41,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
         .inflate(context.layoutInflater, context.root, false)
 
     private var clashRunning = false
+    private var wasRunning = false
     private var forwardedText = ""
     private var uploadText = ""
     private var downloadText = ""
@@ -76,12 +77,19 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
 
     suspend fun setClashRunning(running: Boolean) {
         withContext(Dispatchers.Main) {
+            // Only (re)start the duration timer + runnable on an actual
+            // false->true transition, NOT on every refresh (e.g. returning
+            // from background). Otherwise the "connected for mm:ss" counter
+            // would reset to 0:00 every time the app is switched back to.
+            val changed = running != wasRunning
             clashRunning = running
             binding.clashRunning = running
             binding.statusColor = if (running) colorOk else colorStopped
             if (running) {
-                startMillis = System.currentTimeMillis()
-                handler.post(durationRunnable)
+                if (changed) {
+                    startMillis = System.currentTimeMillis()
+                    handler.post(durationRunnable)
+                }
             } else {
                 handler.removeCallbacks(durationRunnable)
                 binding.speedChart.clear()
@@ -90,6 +98,7 @@ class MainDesign(context: Context) : Design<MainDesign.Request>(context) {
             updateStatusMeta()
             updateConnButton()
             updateTileContexts()
+            wasRunning = running
         }
     }
 

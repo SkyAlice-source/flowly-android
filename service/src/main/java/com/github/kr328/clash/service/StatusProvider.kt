@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.os.Process
 import com.github.kr328.clash.common.Global
 
 class StatusProvider : ContentProvider() {
@@ -61,12 +62,15 @@ class StatusProvider : ContentProvider() {
         const val METHOD_CURRENT_PROFILE = "currentProfile"
 
         private const val CLASH_SERVICE_RUNNING_FILE = "service_running.lock"
+        private const val TUN_ACTIVE_FILE = "tun_active.lock"
 
         var serviceRunning: Boolean = false
             set(value) {
                 field = value
-
-                shouldStartClashOnBoot = value
+                if (value) {
+                    shouldStartClashOnBoot = true
+                    runningPid = Process.myPid().toLong()
+                }
             }
         var shouldStartClashOnBoot: Boolean
             get() = Global.application.filesDir.resolve(CLASH_SERVICE_RUNNING_FILE).exists()
@@ -79,5 +83,37 @@ class StatusProvider : ContentProvider() {
                 }
             }
         var currentProfile: String? = null
+        var runningPid: Long = 0
+
+        /**
+         * Whether the VPN tunnel (tun interface) is currently established.
+         * Persisted to a file so the main process can read it cross-process
+         * (TunService runs in :background, MainActivity runs in the main proc).
+         * This must reflect the REAL tunnel state, not just "is the process alive",
+         * because the OS can revoke/freeze the tunnel while the process survives.
+         */
+        var tunActive: Boolean
+            get() = Global.application.filesDir.resolve(TUN_ACTIVE_FILE).exists()
+            set(value) {
+                Global.application.filesDir.resolve(TUN_ACTIVE_FILE).apply {
+                    if (value) createNewFile() else delete()
+                }
+            }
+
+        /**
+         * Check if any process we launched with [runningPid] is still alive.
+         * Returns false if either no PID was recorded or the recorded process has died.
+         */
+        fun isProcessActive(): Boolean {
+            if (runningPid == 0L) return false
+            try {
+                val am = Global.application.getSystemService(
+                    android.content.Context.ACTIVITY_SERVICE
+                ) as android.app.ActivityManager
+                return am.runningAppProcesses?.any { it.pid == runningPid.toInt() } ?: false
+            } catch (_: Exception) {
+                return false
+            }
+        }
     }
 }

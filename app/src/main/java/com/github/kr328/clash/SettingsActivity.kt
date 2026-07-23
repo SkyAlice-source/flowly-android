@@ -106,8 +106,16 @@ class SettingsActivity : BaseActivity<SettingsDesign>() {
                             startActivity(ProfilesActivity::class.intent)
                             finish()
                         }
-                        SettingsDesign.Request.OpenBackground ->
-                            VendorBackground.openBackgroundSettings(this@SettingsActivity)
+                        SettingsDesign.Request.OpenBackground -> {
+                            val opened =
+                                VendorBackground.openBackgroundSettings(this@SettingsActivity)
+                            val msg = if (opened) {
+                                R.string.bg_settings_hint
+                            } else {
+                                R.string.bg_settings_failed
+                            }
+                            Toast.makeText(this@SettingsActivity, msg, Toast.LENGTH_LONG).show()
+                        }
                         SettingsDesign.Request.About -> {
                             val versionName = runCatching {
                                 packageManager.getPackageInfo(packageName, 0).versionName

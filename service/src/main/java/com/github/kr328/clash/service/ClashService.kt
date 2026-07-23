@@ -3,6 +3,7 @@ package com.github.kr328.clash.service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.os.Process
 import com.github.kr328.clash.common.log.Log
 import com.github.kr328.clash.service.clash.clashRuntime
 import com.github.kr328.clash.service.clash.module.*
@@ -69,10 +70,19 @@ class ClashService : BaseService() {
     override fun onCreate() {
         super.onCreate()
 
-        if (StatusProvider.serviceRunning)
+        // Robust duplicate-instance guard (same logic as TunService)
+        if (StatusProvider.serviceRunning && StatusProvider.isProcessActive()) {
             return stopSelf()
+        }
+
+        val isNewInstance = !StatusProvider.isProcessActive()
 
         StatusProvider.serviceRunning = true
+        StatusProvider.runningPid = Process.myPid().toLong()
+
+        if (isNewInstance) {
+            StatusProvider.shouldStartClashOnBoot = false
+        }
 
         StaticNotificationModule.createNotificationChannel(this)
         StaticNotificationModule.notifyLoadingNotification(this)
@@ -83,7 +93,7 @@ class ClashService : BaseService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         sendClashStarted()
 
-        return START_STICKY
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent?): IBinder {

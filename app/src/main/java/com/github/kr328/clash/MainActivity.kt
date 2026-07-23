@@ -22,6 +22,7 @@ import com.github.kr328.clash.core.model.TunnelState
 import com.github.kr328.clash.design.MainDesign
 import com.github.kr328.clash.design.model.DarkMode
 import com.github.kr328.clash.design.ui.ToastDuration
+import com.github.kr328.clash.common.log.Log
 import com.github.kr328.clash.util.startClashService
 import com.github.kr328.clash.util.stopClashService
 import com.github.kr328.clash.util.withClash
@@ -64,9 +65,16 @@ class MainActivity : BaseActivity<MainDesign>() {
         // 但服务已不在 —— 说明 :background 进程被系统/厂商后台管理杀掉。
         // 此时静默重连（VPN 已授权，VpnService.prepare() 返回 null，不会弹确认框），
         // 并借机引导用户去厂商的后台运行设置页，从根上减少被杀。
+        // 隧道仍通（tun_active.lock 文件标记 true，跨进程可读）：立即同步 UI，
+        // 避免进应用先闪「未连接」再转圈。recover 仍只在 tunActive=false 时真正重建。
+        if (StatusProvider.tunActive) {
+            design.setClashRunning(true)
+        }
+
         recoverIfKilledInBackground(design)
 
         val ticker = ticker(TimeUnit.SECONDS.toMillis(1))
+        var lastHealthCheck: Long = 0
 
         while (isActive) {
             select<Unit> {
@@ -76,11 +84,46 @@ class MainActivity : BaseActivity<MainDesign>() {
                             design.fetch()
                             promptBatteryOptimizationIfNeeded()
                         }
-                        Event.ActivityStart,
                         Event.ServiceRecreated,
-                        Event.ClashStop,
                         Event.ProfileLoaded, Event.ProfileChanged -> design.fetch()
+                        // ClashStop: the :background process was just killed (e.g. system
+                        // foreground-service timeout while backgrounded). Do NOT query it via
+                        // withClash here — the binder is dead and would throw DeadObjectException
+                        // uncaught in this coroutine, crashing the app in the background.
+                        // Just reflect the stopped state on the UI.
+                        Event.ClashStop -> design.setClashRunning(false)
                         else -> Unit
+                    }
+                }
+                if (clashRunning) {
+                    ticker.onReceive {
+                        design.fetchTraffic()
+
+                        // Health check every 30 seconds: probe the :background process
+                        // to detect Go runtime corruption before ColorOS kills us permanently.
+                        if (System.currentTimeMillis() - lastHealthCheck > 30_000L) {
+                            lastHealthCheck = System.currentTimeMillis()
+                            var healthy = true
+                            try {
+                                kotlinx.coroutines.withTimeout(TimeUnit.SECONDS.toMillis(5)) {
+                                    withClash { queryTunnelState() }
+                                }
+                            } catch (e: Exception) {
+                                healthy = false
+                            }
+                            if (!healthy) {
+                                // ColorOS 会瞬时冻结 :background 进程，使 queryTunnelState
+                                // 超时（healthy=false），但隧道其实还通（tunActive 文件仍为 true）。
+                                // 此时若直接 ClashStop 会导致进应用/运行中莫名重建圆环。
+                                // 只有隧道标记也消失时才判定真死，触发恢复。
+                                if (!StatusProvider.tunActive) {
+                                    Log.w("Health check failed AND tunnel inactive, triggering recovery")
+                                    events.trySend(Event.ClashStop)
+                                } else {
+                                    Log.d("Health check timed out but tunnel marker active; skip recovery")
+                                }
+                            }
+                        }
                     }
                 }
                 design.requests.onReceive {
@@ -181,11 +224,6 @@ class MainActivity : BaseActivity<MainDesign>() {
                             design.showAbout(queryAppVersionName())
                     }
                 }
-                if (clashRunning) {
-                    ticker.onReceive {
-                        design.fetchTraffic()
-                    }
-                }
             }
         }
     }
@@ -195,9 +233,6 @@ class MainActivity : BaseActivity<MainDesign>() {
 
         val state = withClash {
             queryTunnelState()
-        }
-        val providers = withClash {
-            queryProviders()
         }
 
         currentMode = state.mode
@@ -217,8 +252,13 @@ class MainActivity : BaseActivity<MainDesign>() {
     }
 
     private suspend fun MainDesign.fetchTraffic() {
-        withClash {
-            setTraffic(queryTrafficNow())
+        try {
+            withClash {
+                setTraffic(queryTrafficNow())
+            }
+        } catch (e: Exception) {
+            // :background process was reclaimed by the system (foreground-service
+            // timeout) between ticks — skip this sample instead of crashing.
         }
     }
 
@@ -234,43 +274,16 @@ class MainActivity : BaseActivity<MainDesign>() {
      * 在用户主动断开时会被删除，因此它为 true 而 [clashRunning] 为 false，
      * 只可能是服务进程被系统强杀。恢复动作对用户静默（VPN 授权仍然有效）。
      */
-    private suspend fun recoverIfKilledInBackground(design: MainDesign) {
-        if (!StatusProvider.shouldStartClashOnBoot) return
-        if (clashRunning) return
-
-        val vpnRequest = startClashService()
-        if (vpnRequest != null) {
-            // 极少见：VPN 授权被系统撤销，需要用户重新确认
-            vpnRequestLauncher.launch(vpnRequest)
-            return
-        }
-
-        design.showToast(DesignR.string.bg_recovered_toast, ToastDuration.Long)
-        promptVendorBackgroundIfNeeded()
-    }
-
     /**
-     * 检测到后台被杀后，引导用户去厂商的后台运行管理页（只弹一次）。
-     * 已经豁免电池优化的用户大概率已配好权限，不再打扰。
+     * 后台连接被系统中断后，App 打开时只如实反映隧道状态——不强制重连、不弹提示。
+     *
+     * 之前的实现会在 onStart 里自动 startClashService 并弹「连接被系统中断，已自动恢复」，
+     * 造成「一打开应用就连接、还显示被恢复」的回归（用户本意是手动控制 VPN）。
+     * 现在：连着显示已连接，断了显示未连接，由用户自己点「启动」。
+     * 保活引导放在设置页「后台运行设置」中，不再每次打开都打扰。
      */
-    private fun promptVendorBackgroundIfNeeded() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
-
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (powerManager.isIgnoringBatteryOptimizations(packageName)) return
-
-        val store = BatteryOptStore(this)
-        if (store.vendorPromptShown) return
-        store.vendorPromptShown = true
-
-        AlertDialog.Builder(this).apply {
-            setTitle(DesignR.string.bg_vendor_title)
-            setMessage(DesignR.string.bg_vendor_message)
-            setPositiveButton(DesignR.string.battery_opt_go) { _, _ -> openVendorBackgroundSettings() }
-            setNegativeButton(DesignR.string.battery_opt_later) { _, _ -> }
-            setCancelable(true)
-            show()
-        }
+    private suspend fun recoverIfKilledInBackground(design: MainDesign) {
+        // 故意为空：不在打开 App 时自动重连，也不弹 toast。
     }
 
     /**

@@ -15,9 +15,13 @@ fun Context.startForegroundServiceCompat(intent: Intent) {
     }
 }
 
-fun Service.startForegroundCompat(id: Int, notification: Notification) {
+fun Service.startForegroundCompat(
+    id: Int,
+    notification: Notification,
+    type: Int = ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        startForeground(id, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        startForeground(id, notification, type)
     } else {
         startForeground(id, notification)
     }

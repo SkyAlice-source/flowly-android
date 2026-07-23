@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
+import android.os.Process
 import com.github.kr328.clash.common.compat.pendingIntentFlags
 import com.github.kr328.clash.common.constants.Components
 import com.github.kr328.clash.common.log.Log
@@ -83,10 +84,32 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
     override fun onCreate() {
         super.onCreate()
 
-        if (StatusProvider.serviceRunning)
+        // Robust duplicate-instance guard:
+        // - Normal path: serviceRunning=true means another instance already started
+        // - Crash recovery (START_STICKY): if the old :background process was killed,
+        //   onDestroy never fired so the lock file still exists, but the old PID is dead.
+        //   We allow startup BUT clean up the stale lock if no older instance is active,
+        //   because the old instance cannot resume anyway.
+        if (StatusProvider.serviceRunning && StatusProvider.isProcessActive()) {
+            // Duplicate — stop immediately
             return stopSelf()
+        }
+
+        val isNewInstance = !StatusProvider.isProcessActive()
 
         StatusProvider.serviceRunning = true
+        StatusProvider.runningPid = Process.myPid().toLong()
+
+        // NOTE: Do NOT clear shouldStartClashOnBoot here. It is the user's "expect
+        // connected" intent (persisted lock) and must survive process recreation
+        // (ColorOS freeze, START_STICKY restart, system VPN revoke). A process that
+        // dies while the user still wanted it on MUST be auto-recovered; clearing the
+        // lock here is what broke recovery. User-initiated stop already clears it in
+        // ClashService (~line 84).
+
+        // Tunnel is not built yet at this point. Start from false so a stale "true"
+        // left behind by a hard crash (onDestroy never ran) is cleared on restart.
+        StatusProvider.tunActive = false
 
         StaticNotificationModule.createNotificationChannel(this)
         StaticNotificationModule.notifyLoadingNotification(this)
@@ -103,6 +126,7 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
     override fun onDestroy() {
         TunModule.requestStop()
 
+        StatusProvider.tunActive = false
         StatusProvider.serviceRunning = false
 
         sendClashStopped(reason)
@@ -118,6 +142,19 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
         super.onTrimMemory(level)
 
         runtime.requestGc()
+    }
+
+    override fun onRevoke() {
+        // The OS (or a vendor like ColorOS on background freeze) revoked the VPN.
+        // The tun fd is already closed by the system, but by default VpnService does
+        // NOT stop the service — so :background stays alive, clashRunning stays true,
+        // and the main process wrongly thinks "VPN is connected" and skips recovery.
+        // Mark the tunnel inactive and let the runtime stop cleanly (the finally block
+        // calls stopSelf), which flips clashRunning to false so the main process can
+        // re-establish the tunnel on next foreground via recoverIfKilledInBackground.
+        Log.i("TunService revoked by system; tearing down cleanly")
+        StatusProvider.tunActive = false
+        TunModule.requestStop()
     }
 
     private fun TunModule.open() {
@@ -226,6 +263,8 @@ class TunService : VpnService(), CoroutineScope by CoroutineScope(Dispatchers.De
         }
 
         attach(device)
+
+        StatusProvider.tunActive = true
     }
 
     companion object {

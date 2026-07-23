@@ -84,6 +84,7 @@ subprojects {
         ndkVersion = "28.2.13676358"
 
         compileSdkVersion(defaultConfig.targetSdk!!)
+        buildToolsVersion = "35.0.0"
 
         if (isApp) {
             packagingOptions {
